@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/layout/Header';
@@ -15,6 +15,9 @@ import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
+import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
+import { OfflineIndicator } from './components/ui/OfflineIndicator';
+import { usePWA } from './hooks/usePWA';
 
 // Create context for interview state
 interface InterviewContextType {
@@ -34,6 +37,13 @@ export const useInterview = () => {
 
 function App() {
   const [isInterviewActive, setIsInterviewActive] = useState(false);
+  const { registerServiceWorker } = usePWA();
+
+  // Register service worker on app load
+  useEffect(() => {
+    registerServiceWorker();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AuthProvider>
@@ -112,6 +122,8 @@ function App() {
         theme="light"
         className="mt-16"
       />
+      <PWAInstallPrompt />
+      <OfflineIndicator />
     </AuthProvider>
   );
 }
