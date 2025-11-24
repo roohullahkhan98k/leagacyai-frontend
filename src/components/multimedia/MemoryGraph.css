@@ -1,0 +1,68 @@
+/* React Flow Controls Styling - Clean & Visible */
+.react-flow__controls {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  background: #ffffff !important;
+  color: #374151 !important;
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 8px !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #f9fafb !important;
+}
+
+.react-flow__controls-button svg {
+  fill: #374151 !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+/* Dark mode controls */
+.dark .react-flow__controls {
+  background: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .react-flow__controls-button {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+  border-bottom-color: #374151 !important;
+}
+
+.dark .react-flow__controls-button:hover {
+  background: #374151 !important;
+}
+
+.dark .react-flow__controls-button svg {
+  fill: #e5e7eb !important;
+}
+
+/* Main canvas background - Professional gray */
+.react-flow {
+  background: #f1f5f9 !important;
+}
+
+.dark .react-flow {
+  background: #0f172a !important;
+}
+
+/* Background pattern */
+.react-flow__background {
+  background-color: transparent !important;
+}
+
+
