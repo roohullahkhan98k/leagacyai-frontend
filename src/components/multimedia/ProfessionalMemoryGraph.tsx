@@ -10,14 +10,43 @@ import {
   useEdgesState,
   ConnectionLineType,
   MarkerType,
+  Handle,
+  Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './MemoryGraph.css';
 import type { GraphResponse } from '../../services/memoryGraphApi';
 
+// Custom Memory Node Component
+const MemoryNode = ({ data }: { data: { label: string; fullText?: string } }) => {
+  return (
+    <div 
+      className="react-flow__node-default" 
+      title={data.fullText || data.label}
+      style={{
+        padding: '12px 16px',
+        borderRadius: '10px',
+        background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+        color: '#fff',
+        fontSize: '12px',
+        minWidth: '180px',
+        maxWidth: '300px',
+        wordBreak: 'break-word',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        boxShadow: '0 8px 16px rgba(139, 92, 246, 0.25)',
+      }}
+    >
+      <Handle type="target" position={Position.Top} />
+      <div>{data.label}</div>
+      <Handle type="source" position={Position.Bottom} />
+    </div>
+  );
+};
+
 interface ProfessionalMemoryGraphProps {
   graphData: GraphResponse | null;
-  onNodeClick?: (nodeId: string) => void;
+  onNodeClick?: (nodeId: string, node?: Node) => void;
   className?: string;
 }
 
@@ -31,6 +60,14 @@ const ProfessionalMemoryGraph = ({ graphData, onNodeClick, className }: Professi
       } catch {}
     }
     return [];
+  };
+
+  // Utility function to truncate text to 10 words with ellipses
+  const truncateText = (text: string, maxWords: number = 10): string => {
+    if (!text) return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
   };
 
   const backendBase = (import.meta as any).env?.VITE_BACKEND_URL;
@@ -72,15 +109,9 @@ const ProfessionalMemoryGraph = ({ graphData, onNodeClick, className }: Professi
 
       switch (n.type) {
         case 'memory':
-          label = meta.document || n.label;
-          style = {
-            ...style,
-            background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
-            minWidth: '180px',
-            padding: '12px 16px',
-            boxShadow: '0 8px 16px rgba(139, 92, 246, 0.25)',
-            fontSize: '12px',
-          };
+          const fullText = meta.document || n.label;
+          label = truncateText(fullText);
+          // Style will be handled by custom MemoryNode component
           break;
         case 'person':
           style = {
@@ -123,12 +154,21 @@ const ProfessionalMemoryGraph = ({ graphData, onNodeClick, className }: Professi
           break;
       }
 
+      const nodeData: any = { label, originalNode: n };
+      let nodeType = 'default';
+      
+      if (n.type === 'memory') {
+        const fullText = meta.document || n.label;
+        nodeData.fullText = fullText;
+        nodeType = 'memoryNode';
+      }
+
       nodes.push({
         id: n.id,
-        type: 'default',
+        type: nodeType,
         position: { x: idx * 250, y: Math.random() * 400 },
-        data: { label },
-        style,
+        data: nodeData,
+        style: nodeType === 'memoryNode' ? undefined : style,
       });
       
       nodeIdSet.add(n.id);
@@ -256,17 +296,22 @@ const ProfessionalMemoryGraph = ({ graphData, onNodeClick, className }: Professi
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       if (onNodeClick) {
-        onNodeClick(node.id);
+        onNodeClick(node.id, node);
       }
     },
     [onNodeClick]
   );
+
+  const nodeTypes = useMemo(() => ({
+    memoryNode: MemoryNode,
+  }), []);
 
   return (
     <div className={className} style={{ width: '100%', height: '100%' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
