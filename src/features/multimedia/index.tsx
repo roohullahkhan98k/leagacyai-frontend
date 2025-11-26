@@ -2,11 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { 
   Image, ArrowLeft, Upload, Grid3X3, 
   Home, Link2, Brain, Sparkles, TrendingUp, Clock, 
-  BarChart3, AlertCircle, Zap
+  BarChart3, AlertCircle, Zap, RefreshCcw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-import PageContainer from '../../components/layout/PageContainer';
+import { cn } from '../../utils/cn';
 import MediaUploader from '../../components/multimedia/MediaUploader';
 import MediaGallery from '../../components/multimedia/MediaGallery';
 import MemoryNodeManager from '../../components/multimedia/MemoryNodeManager';
@@ -127,6 +126,10 @@ const MultimediaPage = () => {
     }
   }, []);
 
+  const refreshAll = async () => {
+    await handleDataRefresh();
+  };
+
   const handleUploadComplete = useCallback(async (files: MediaFile[]) => {
     // Refresh stats after upload
     try {
@@ -199,84 +202,84 @@ const MultimediaPage = () => {
   const renderDashboard = () => (
     <div className="space-y-8">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-2xl p-8 border border-primary-100 dark:border-primary-800">
+      <div className="bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-800">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Multimedia Management
-            </h1>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Dashboard Overview
+            </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
               Organize your media files and create meaningful connections with memory nodes
             </p>
             <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center space-x-1">
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Auto-tagging & Metadata</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Link2 className="h-4 w-4" />
+                <Link2 className="h-4 w-4 text-violet-600 dark:text-violet-400" />
                 <span>Smart Linking</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Brain className="h-4 w-4" />
+                <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 <span>Memory Organization</span>
               </div>
             </div>
           </div>
           <div className="hidden lg:block">
             <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-              <Image className="h-16 w-16 text-primary-600" />
+              <Image className="h-16 w-16 text-indigo-600 dark:text-indigo-400" />
             </div>
           </div>
-            </div>
-          </div>
+        </div>
+      </div>
           
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Media</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalMedia}</p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-              <Image className="h-6 w-6 text-blue-600" />
+            <div className="p-3 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-full">
+              <Image className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Memory Nodes</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalNodes}</p>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-              <Brain className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 rounded-full">
+              <Brain className="h-6 w-6 text-violet-600 dark:text-violet-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Linked Media</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.linkedMedia}</p>
             </div>
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-              <Link2 className="h-6 w-6 text-purple-600" />
+            <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full">
+              <Link2 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Unlinked Media</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.unlinkedMedia}</p>
             </div>
-            <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-              <AlertCircle className="h-6 w-6 text-orange-600" />
+            <div className="p-3 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-full">
+              <AlertCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
             </div>
           </div>
         </Card>
@@ -284,70 +287,69 @@ const MultimediaPage = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Zap className="h-5 w-5 mr-2 text-yellow-600" />
+            <Zap className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
             Quick Actions
           </h3>
           <div className="space-y-3">
             <button
               onClick={() => setActiveTab('upload')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20 rounded-lg hover:from-indigo-100 hover:to-violet-100 dark:hover:from-indigo-900/30 dark:hover:to-violet-900/30 transition-all duration-300 border border-indigo-200/50 dark:border-indigo-700/30 hover:border-indigo-300 dark:hover:border-indigo-600"
             >
               <div className="flex items-center space-x-3">
-                <Upload className="h-5 w-5 text-primary-600" />
+                <Upload className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 <span className="font-medium text-gray-900 dark:text-white">Upload Media Files</span>
               </div>
-              <ArrowLeft className="h-4 w-4 text-gray-400 rotate-180" />
+              <ArrowLeft className="h-4 w-4 text-indigo-400 rotate-180" />
             </button>
             
             <button
               onClick={() => setActiveTab('nodes')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/20 dark:to-purple-950/20 rounded-lg hover:from-violet-100 hover:to-purple-100 dark:hover:from-violet-900/30 dark:hover:to-purple-900/30 transition-all duration-300 border border-violet-200/50 dark:border-violet-700/30 hover:border-violet-300 dark:hover:border-violet-600"
             >
               <div className="flex items-center space-x-3">
-                <Brain className="h-5 w-5 text-green-600" />
+                <Brain className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                 <span className="font-medium text-gray-900 dark:text-white">Create Memory Node</span>
               </div>
-              <ArrowLeft className="h-4 w-4 text-gray-400 rotate-180" />
+              <ArrowLeft className="h-4 w-4 text-violet-400 rotate-180" />
             </button>
             
             <button
               onClick={() => setActiveTab('linking')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 transition-all duration-300 border border-purple-200/50 dark:border-purple-700/30 hover:border-purple-300 dark:hover:border-purple-600"
             >
               <div className="flex items-center space-x-3">
-                <Link2 className="h-5 w-5 text-purple-600" />
+                <Link2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 <span className="font-medium text-gray-900 dark:text-white">Link Media to Memories</span>
               </div>
-              <ArrowLeft className="h-4 w-4 text-gray-400 rotate-180" />
+              <ArrowLeft className="h-4 w-4 text-purple-400 rotate-180" />
             </button>
             
             <button
               onClick={() => setActiveTab('links')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20 rounded-lg hover:from-indigo-100 hover:to-violet-100 dark:hover:from-indigo-900/30 dark:hover:to-violet-900/30 transition-all duration-300 border border-indigo-200/50 dark:border-indigo-700/30 hover:border-indigo-300 dark:hover:border-indigo-600"
             >
               <div className="flex items-center space-x-3">
-                <Link2 className="h-5 w-5 text-indigo-600" />
+                <Link2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 <span className="font-medium text-gray-900 dark:text-white">View All Links</span>
               </div>
-              <ArrowLeft className="h-4 w-4 text-gray-400 rotate-180" />
+              <ArrowLeft className="h-4 w-4 text-indigo-400 rotate-180" />
             </button>
-            
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
+            <TrendingUp className="h-5 w-5 mr-2 text-violet-600 dark:text-violet-400" />
             Recent Activity
           </h3>
           <div className="space-y-3">
             {stats.recentActivity.length > 0 ? (
               stats.recentActivity.slice(0, 5).map((activity, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                    <Clock className="h-4 w-4 text-primary-600" />
+                <div key={index} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/10 dark:to-violet-950/10 rounded-lg border border-indigo-200/30 dark:border-indigo-700/20">
+                  <div className="p-2 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-lg">
+                    <Clock className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.action}</p>
@@ -377,8 +379,11 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full">
-                  <Upload className="h-12 w-12 text-primary-600" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-full">
+                    <Upload className="h-12 w-12 text-indigo-600 dark:text-indigo-400" />
+                  </div>
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -400,23 +405,26 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <Grid3X3 className="h-12 w-12 text-blue-600" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 rounded-full">
+                    <Grid3X3 className="h-12 w-12 text-violet-600 dark:text-violet-400" />
+                  </div>
                 </div>
-            </div>
+              </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Media Gallery
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 Browse and manage your uploaded media files
-            </p>
-          </div>
+              </p>
+            </div>
             <MediaGallery 
               onMediaSelect={handleMediaSelect} 
               selectedNode={selectedNode}
               onDataRefresh={handleDataRefresh}
             />
-        </div>
+          </div>
         );
 
       case 'nodes':
@@ -424,17 +432,20 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <Brain className="h-12 w-12 text-green-600" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full">
+                    <Brain className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+                  </div>
+                </div>
               </div>
-            </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Memory Nodes
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 Create and manage memory nodes to organize your media
-            </p>
-          </div>
+              </p>
+            </div>
             <MemoryNodeManager onNodeSelect={handleNodeSelect} />
           </div>
         );
@@ -444,17 +455,20 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                  <Link2 className="h-12 w-12 text-purple-600" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-full">
+                    <Link2 className="h-12 w-12 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                </div>
               </div>
-            </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Link Media to Memories
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 Connect your media files to memory nodes to create rich relationships
-            </p>
-          </div>
+              </p>
+            </div>
             <MediaLinker
               selectedNode={selectedNode}
               selectedMedia={selectedMedia}
@@ -499,19 +513,22 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
-                  <Link2 className="h-12 w-12 text-indigo-600" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-violet-100 to-indigo-100 dark:from-violet-900/30 dark:to-indigo-900/30 rounded-full">
+                    <Link2 className="h-12 w-12 text-violet-600 dark:text-violet-400" />
+                  </div>
+                </div>
               </div>
-            </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 All Links Overview
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 View and manage all connections between your media and memory nodes
-            </p>
-          </div>
+              </p>
+            </div>
             <LinksOverview onDataRefresh={handleDataRefresh} />
-        </div>
+          </div>
         );
 
 
@@ -520,10 +537,13 @@ const MultimediaPage = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full">
-                  <BarChart3 className="h-12 w-12 text-primary-600" />
-            </div>
-          </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 rounded-full blur opacity-20 animate-pulse" />
+                  <div className="relative p-4 bg-gradient-to-r from-indigo-100 via-violet-100 to-purple-100 dark:from-indigo-900/30 dark:via-violet-900/30 dark:to-purple-900/30 rounded-full">
+                    <BarChart3 className="h-12 w-12 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                </div>
+              </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Analytics & Insights
               </h2>
@@ -543,48 +563,94 @@ const MultimediaPage = () => {
   };
 
   return (
-    <PageContainer>
-      <div className="max-w-7xl mx-auto py-8 px-4">
+    <div className="w-full min-h-screen overflow-hidden">
+      {/* Animated Background Gradient - Indigo/Violet Theme */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-indigo-500/20 to-violet-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <div className="relative w-full max-w-[95rem] mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8 xl:px-12">
         {/* Header */}
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+        <div className="mb-10">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mb-6 transition-colors group"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Home
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Multimedia Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Organize your media files and create meaningful connections with memory nodes
-          </p>
+          
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl blur opacity-20 animate-pulse" />
+                <div className="relative p-3 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-xl shadow-lg">
+                  <Image className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                  <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+                    Multimedia Management
+                  </span>
+                </h1>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
+                  Upload, Organize & Link Media
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </nav>
+        {/* Tab Navigation */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between gap-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+            {/* Tabs on Left */}
+            <div className="flex flex-wrap gap-3 flex-1">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      'flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300',
+                      isActive
+                        ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/50 transform scale-105'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 dark:hover:from-indigo-950/20 dark:hover:to-violet-950/20 hover:scale-105'
+                    )}
+                  >
+                    <tab.icon className="h-5 w-5" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Refresh Button on Right */}
+            <button
+              onClick={refreshAll}
+              className={cn(
+                'p-3 rounded-xl transition-all duration-300 flex-shrink-0',
+                'bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20',
+                'border-2 border-indigo-200/50 dark:border-indigo-700/30',
+                'hover:from-indigo-100 hover:to-violet-100 dark:hover:from-indigo-900/30 dark:hover:to-violet-900/30',
+                'hover:border-indigo-300 dark:hover:border-indigo-600',
+                'hover:scale-110 hover:shadow-lg hover:shadow-indigo-500/20',
+                'text-indigo-600 dark:text-indigo-400'
+              )}
+              title="Refresh all data"
+            >
+              <RefreshCcw className="h-5 w-5" />
+            </button>
           </div>
         </div>
 
         {/* Tab Content */}
         {renderTabContent()}
       </div>
-    </PageContainer>
+    </div>
   );
 };
 

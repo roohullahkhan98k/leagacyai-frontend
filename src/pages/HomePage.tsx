@@ -216,39 +216,72 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Link 
-                key={index} 
-                to={feature.link}
-                className="group block h-full"
-              >
-                <Card 
-                  variant="hover" 
-                  className="h-full border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-transparent transition-all duration-500 overflow-hidden relative"
+            {features.map((feature, index) => {
+              // Get color theme for each feature
+              const colorMap: Record<string, { border: string; text: string; shadow: string }> = {
+                'from-blue-500 to-cyan-500': {
+                  border: 'hover:border-blue-300 dark:hover:border-blue-700',
+                  text: 'text-blue-600 dark:text-blue-400',
+                  shadow: 'hover:shadow-blue-500/20'
+                },
+                'from-purple-500 to-pink-500': {
+                  border: 'hover:border-purple-300 dark:hover:border-purple-700',
+                  text: 'text-purple-600 dark:text-purple-400',
+                  shadow: 'hover:shadow-purple-500/20'
+                },
+                'from-orange-500 to-red-500': {
+                  border: 'hover:border-orange-300 dark:hover:border-orange-700',
+                  text: 'text-orange-600 dark:text-orange-400',
+                  shadow: 'hover:shadow-orange-500/20'
+                },
+                'from-green-500 to-emerald-500': {
+                  border: 'hover:border-green-300 dark:hover:border-green-700',
+                  text: 'text-green-600 dark:text-green-400',
+                  shadow: 'hover:shadow-green-500/20'
+                },
+                'from-indigo-500 to-violet-500': {
+                  border: 'hover:border-indigo-300 dark:hover:border-indigo-700',
+                  text: 'text-indigo-600 dark:text-indigo-400',
+                  shadow: 'hover:shadow-indigo-500/20'
+                }
+              };
+              
+              const colors = colorMap[feature.gradient] || colorMap['from-blue-500 to-cyan-500'];
+              
+              return (
+                <Link 
+                  key={index} 
+                  to={feature.link}
+                  className="group block h-full"
                 >
-                  {/* Gradient overlay on hover */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                  
-                  <CardContent className="p-8 h-full flex flex-col relative z-10">
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.gradient} text-white mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
-                      {feature.icon}
-                    </div>
+                  <Card 
+                    variant="hover" 
+                    className={`h-full border-2 border-gray-200/50 dark:border-gray-700/50 ${colors.border} transition-all duration-500 overflow-hidden relative ${colors.shadow} hover:shadow-2xl hover:scale-[1.02]`}
+                  >
+                    {/* Gradient overlay on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                     
-                    <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 dark:group-hover:from-white dark:group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow leading-relaxed">
-                      {feature.description}
-                    </p>
-                    
-                    <div className="flex items-center text-blue-600 dark:text-blue-400 font-medium group-hover:translate-x-2 transition-transform duration-300">
-                      Learn more
-                      <ArrowRight className="h-5 w-5 ml-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                    <CardContent className="p-8 h-full flex flex-col relative z-10">
+                      <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.gradient} text-white mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl`}>
+                        {feature.icon}
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 dark:group-hover:from-white dark:group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                        {feature.description}
+                      </p>
+                      
+                      <div className={`flex items-center ${colors.text} font-medium group-hover:translate-x-2 transition-all duration-300`}>
+                        Learn more
+                        <ArrowRight className="h-5 w-5 ml-2 group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LogOut, User, Menu, X, LogIn, UserPlus, Palette, BrainCircuit, Network, Mic, Image } from 'lucide-react';
+import { LogOut, User, Menu, X, LogIn, UserPlus, Palette } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../ui/ThemeToggle';
 import { useState, useEffect } from 'react';
@@ -68,42 +68,6 @@ const Header = () => {
             </Link>
           </div>
           
-          {/* Navigation - Center (Desktop) - Only show when authenticated */}
-          {isAuthenticated && (
-            <nav className="hidden lg:flex items-center space-x-1 mx-8 flex-1 justify-center">
-              <Link 
-                to="/memory-graph" 
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-blue-600/0 to-purple-600/0 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Memory Graph
-              </Link>
-              <Link 
-                to="/voice-cloning" 
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-orange-600/0 to-red-600/0 hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Voice Cloning
-              </Link>
-              <Link 
-                to="/avatar-service" 
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-green-600/0 to-emerald-600/0 hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Avatars
-              </Link>
-              <Link 
-                to="/interview" 
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-cyan-600/0 to-blue-600/0 hover:from-cyan-600 hover:to-blue-600 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Interview
-              </Link>
-              <Link 
-                to="/multimedia" 
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-indigo-600/0 to-violet-600/0 hover:from-indigo-600 hover:to-violet-600 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Multimedia
-              </Link>
-            </nav>
-          )}
-        
           {/* Right Section - Actions */}
           <div className="flex items-center space-x-3 md:space-x-4">
             {/* Theme Toggle */}
@@ -198,52 +162,6 @@ const Header = () => {
               <X className="h-5 w-5" />
             </button>
           </div>
-
-          {/* Navigation Links - Only show when authenticated */}
-          {isAuthenticated && (
-            <nav className="flex-1 p-4 space-y-2">
-              <Link 
-                to="/memory-graph" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-blue-600/0 to-purple-600/0 hover:from-blue-600 hover:to-purple-600 transition-all duration-200"
-              >
-                <Network className="h-5 w-5" />
-                <span>Memory Graph</span>
-              </Link>
-              <Link 
-                to="/voice-cloning" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-orange-600/0 to-red-600/0 hover:from-orange-600 hover:to-red-600 transition-all duration-200"
-              >
-                <Mic className="h-5 w-5" />
-                <span>Voice Cloning</span>
-              </Link>
-              <Link 
-                to="/avatar-service" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-green-600/0 to-emerald-600/0 hover:from-green-600 hover:to-emerald-600 transition-all duration-200"
-              >
-                <User className="h-5 w-5" />
-                <span>Avatars</span>
-              </Link>
-              <Link 
-                to="/interview" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-cyan-600/0 to-blue-600/0 hover:from-cyan-600 hover:to-blue-600 transition-all duration-200"
-              >
-                <BrainCircuit className="h-5 w-5" />
-                <span>Interview</span>
-              </Link>
-              <Link 
-                to="/multimedia" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-white rounded-lg bg-gradient-to-r from-indigo-600/0 to-violet-600/0 hover:from-indigo-600 hover:to-violet-600 transition-all duration-200"
-              >
-                <Image className="h-5 w-5" />
-                <span>Multimedia</span>
-              </Link>
-            </nav>
-          )}
 
           {/* Content */}
           <div className="p-4 space-y-4 border-t border-gray-200 dark:border-gray-700">
