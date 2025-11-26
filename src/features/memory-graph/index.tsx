@@ -292,49 +292,51 @@ const MemoryGraphPage = () => {
   return (
     <PageContainer fullWidth className="!py-0 !px-0">
       <div className="w-full mx-auto py-4 px-4 md:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link to="/" className="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
             <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              <span className="hidden sm:inline">Back</span>
           </Link>
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Network className="h-6 w-6 text-blue-600" />
+              <Network className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
-            <h1 className="text-2xl font-bold">Memory Graph</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Memory Graph</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={() => setShowCreatePanel(true)}>
-              <Plus className="h-4 w-4 mr-2" /> Add Memory
+            <Button size="sm" onClick={() => setShowCreatePanel(true)} className="flex-1 sm:flex-initial bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105">
+              <Plus className="h-4 w-4 mr-2" /> <span className="hidden sm:inline">Add Memory</span><span className="sm:hidden">Add</span>
             </Button>
-            <Button variant="primary" size="sm" onClick={loadGraph} disabled={loadingGraph}>
-              <RefreshCw className={cn('h-4 w-4 mr-2', loadingGraph && 'animate-spin')} /> Refresh
+            <Button variant="primary" size="sm" onClick={loadGraph} disabled={loadingGraph} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
+              <RefreshCw className={cn('h-4 w-4', loadingGraph && 'animate-spin')} />
+              <span className="hidden sm:inline ml-2">Refresh</span>
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-          <div className="xl:col-span-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <div className="mb-3 flex items-center gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
+          <div className="lg:col-span-4 order-2 lg:order-1">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
+              <div className="mb-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <select
-                  className="h-9 px-3 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm truncate"
+                  className="h-9 px-3 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm flex-1 min-w-0"
                   value={selectedMemoryId || ''}
                   onChange={e => focusGraphForMemory(e.target.value)}
+                  style={{ maxWidth: '100%' }}
                 >
                   <option value="">Select a memory to view graph…</option>
                   {availableMemories.map(m => (
-                    <option key={m.id} value={m.id} title={m.label}>{truncateText(m.label)}</option>
+                    <option key={m.id} value={m.id} title={m.label}>{m.label}</option>
                   ))}
                 </select>
-                <Button size="sm" onClick={() => { setIsFloating(v => !v); }}>
-                  <Maximize2 className="h-4 w-4 mr-2" />
-                  {isFloating ? 'Dock' : 'Pop out'}
+                <Button size="sm" onClick={() => { setIsFloating(v => !v); }} className="w-full sm:w-auto bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">
+                  <Maximize2 className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{isFloating ? 'Dock' : 'Pop out'}</span>
                 </Button>
               </div>
               <div className="relative">
                 {!isFloating && (
-                  <div className="h-[80vh] w-full rounded-lg bg-slate-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="h-[60vh] sm:h-[70vh] lg:h-[80vh] w-full rounded-lg bg-slate-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden">
                     {isGraphEmpty ? (
                       <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-gray-900">
                         <div className="text-center text-sm text-gray-500 dark:text-gray-400">
@@ -354,9 +356,9 @@ const MemoryGraphPage = () => {
               </div>
             </div>
           </div>
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <h3 className="font-semibold mb-3 flex items-center"><Search className="h-4 w-4 mr-2" /> Semantic Search</h3>
+          <div className="space-y-4 lg:space-y-6 order-1 lg:order-2">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
+              <h3 className="font-semibold mb-3 flex items-center text-sm sm:text-base"><Search className="h-4 w-4 mr-2" /> Semantic Search</h3>
               <div className="space-y-3">
                 <div className="relative">
                   <Search className={cn('h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400', searching && 'animate-pulse')} />
@@ -376,16 +378,16 @@ const MemoryGraphPage = () => {
                   onChange={e => setPersonFilter(e.target.value)}
                 />
                 <div className="flex justify-end">
-                  <Button size="sm" onClick={onSearch} disabled={searching}>
+                  <Button size="sm" onClick={onSearch} disabled={searching} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                     <Search className={cn('h-4 w-4 mr-2', searching && 'animate-spin')} />
                     {searching ? 'Searching...' : 'Search'}
                   </Button>
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <h3 className="font-semibold mb-3">Results</h3>
-              <div className="space-y-3 overflow-y-auto max-h-[400px] p-1">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">Results</h3>
+              <div className="space-y-3 overflow-y-auto max-h-[300px] sm:max-h-[400px] p-1">
                 {searchResults.length === 0 ? (
                   <p className="text-sm text-gray-500">No results yet. Try searching.</p>
                 ) : searchResults.map((r, i) => {
@@ -456,8 +458,8 @@ const MemoryGraphPage = () => {
                         </div>
                       </div>
                       <div className="mt-2 flex gap-2">
-                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openEditModal(r); }}>Edit</Button>
-                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDeleteModal(r); }}>Delete</Button>
+                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openEditModal(r); }} className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">Edit</Button>
+                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDeleteModal(r); }} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Delete</Button>
                       </div>
                       </div>
                     </div>
@@ -526,7 +528,7 @@ const MemoryGraphPage = () => {
                 </div>
               )}
             </div>
-            <Button onClick={async () => { await onCreateMemory(); setShowCreatePanel(false); }} disabled={creating || !newMemory.document.trim() || !newMemory.person.trim()} className="w-full">
+            <Button onClick={async () => { await onCreateMemory(); setShowCreatePanel(false); }} disabled={creating || !newMemory.document.trim() || !newMemory.person.trim()} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
               <Plus className={cn('h-4 w-4 mr-2', creating && 'animate-spin')} /> Create
             </Button>
         </div>
@@ -619,13 +621,13 @@ const MemoryGraphPage = () => {
                         // eslint-disable-next-line no-console
                         console.error(e);
                       }
-                    }}>Upload & attach</Button>
+                    }} className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">Upload & attach</Button>
                   </div>
                 )}
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={isSaving}>Cancel</Button>
-                <Button onClick={saveEdit} disabled={isSaving}>
+                <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={isSaving} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Cancel</Button>
+                <Button onClick={saveEdit} disabled={isSaving} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                   <RefreshCw className={cn('h-4 w-4 mr-2', isSaving && 'animate-spin')} />
                   {isSaving ? 'Saving...' : 'Save'}
                 </Button>
@@ -644,8 +646,8 @@ const MemoryGraphPage = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Are you sure you want to delete this memory?</p>
             <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 mb-3" disabled value={activeMemory.id} />
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting}>Cancel</Button>
-              <Button variant="secondary" onClick={confirmDelete} disabled={isDeleting}>
+              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Cancel</Button>
+              <Button variant="secondary" onClick={confirmDelete} disabled={isDeleting} className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg shadow-red-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                 <RefreshCw className={cn('h-4 w-4 mr-2', isDeleting && 'animate-spin')} />
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
@@ -848,6 +850,7 @@ const MemoryGraphPage = () => {
                         setViewMemoryModal({ open: false, node: null });
                       }
                     }}
+                    className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105"
                   >
                     Edit
                   </Button>
@@ -860,6 +863,7 @@ const MemoryGraphPage = () => {
                         setViewMemoryModal({ open: false, node: null });
                       }
                     }}
+                    className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg shadow-red-500/50 transition-all duration-300 hover:scale-105"
                   >
                     Delete
                   </Button>

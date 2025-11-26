@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Settings, History, Video } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Settings, History, Video, Sparkles, Zap, Mic, BrainCircuit, ArrowLeft } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import PageContainer from '../../components/layout/PageContainer';
 import InterviewControls from '../../components/interview/InterviewControls';
@@ -29,6 +29,11 @@ const InterviewPage = () => {
   const liveTranscriptionRef = useRef<LiveTranscriptionRef | null>(null);
   const PANEL_GAP = 20;
   const CONTROLS_HEIGHT = 80;
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const handleStartInterview = async () => {
     setIsLoading(true);
@@ -108,90 +113,137 @@ const InterviewPage = () => {
   };
 
   return (
-    <PageContainer>
+    <div className="w-full min-h-screen overflow-hidden">
+      {/* Animated Background Gradient */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
       {viewMode === 'start' && !isInterviewActive && (
-        <div className="max-w-2xl mx-auto py-8 md:py-12 px-4">
-          <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">AI Interview Assistant</h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400">
-              Get real-time AI assistance during your interview with live transcription and intelligent responses.
-            </p>
-          </div>
-
-          <div className="space-y-6 md:space-y-8">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4">How It Works</h2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600">
-                    1
-                  </div>
-                  <p>Join your interview call (Zoom, Teams, or Google Meet)</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600">
-                    2
-                  </div>
-                  <p>Click "Start Interview" and share your screen with audio</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600">
-                    3
-                  </div>
-                  <p>Get real-time transcription and AI-powered answer suggestions</p>
-                </div>
+        <div className="relative w-full min-h-screen flex items-center justify-center py-12 md:py-20 px-4 sm:px-6 lg:px-8">
+          <div className={`w-full max-w-4xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            {/* Badge */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-sm">
+                <Sparkles className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  AI-Powered Interview Assistant
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <Button
-                size="lg"
-                onClick={handleStartInterview}
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                <Video className="h-5 w-5 mr-2" />
-                {isLoading ? 'Starting...' : 'Start Interview'}
-              </Button>
-              
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setViewMode('history')}
-                className="w-full sm:w-auto"
-              >
-                <History className="h-5 w-5 mr-2" />
-                View History
-              </Button>
+            <div className="text-center mb-12">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  AI Interview
+                </span>
+                <br />
+                <span className="text-gray-900 dark:text-white">Assistant</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                Get real-time AI assistance during your interview with live transcription and intelligent answer suggestions powered by advanced AI.
+              </p>
             </div>
 
-            {screenShareError && (
-              <div className="bg-error-50 dark:bg-error-900/30 text-error-700 dark:text-error-300 p-4 rounded-lg">
-                <p className="text-sm">{screenShareError}</p>
+            <div className="space-y-8">
+              {/* How It Works Card */}
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                    How It Works
+                  </h2>
+                </div>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 border border-blue-200/50 dark:border-purple-700/30 hover:shadow-md transition-all duration-200">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg">
+                      1
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Join your interview call (Zoom, Teams, or Google Meet)</p>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 border border-purple-200/50 dark:border-pink-700/30 hover:shadow-md transition-all duration-200">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg">
+                      2
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Click "Start Interview" and share your screen with audio</p>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-950/20 dark:to-blue-950/20 border border-cyan-200/50 dark:border-blue-700/30 hover:shadow-md transition-all duration-200">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
+                      3
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Get real-time transcription and AI-powered answer suggestions</p>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button
+                  size="lg"
+                  onClick={handleStartInterview}
+                  disabled={isLoading}
+                  className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                >
+                  <Video className="h-5 w-5 mr-2" />
+                  {isLoading ? 'Starting...' : 'Start Interview'}
+                </Button>
+                
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setViewMode('history')}
+                  className="text-lg px-8 py-4 border-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 w-full sm:w-auto"
+                >
+                  <History className="h-5 w-5 mr-2" />
+                  View History
+                </Button>
+              </div>
+
+              {screenShareError && (
+                <div className="bg-red-50/80 dark:bg-red-900/30 backdrop-blur-sm text-red-700 dark:text-red-300 p-4 rounded-xl border border-red-200 dark:border-red-800 shadow-lg">
+                  <p className="text-sm font-medium">{screenShareError}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {viewMode === 'history' && (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-          <div className="mb-6">
-            <Button onClick={handleBackToStart} variant="ghost" size="sm">
-              ← Back to Start
-            </Button>
+        <div className="relative w-full min-h-screen py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="mb-6">
+              <Button 
+                onClick={handleBackToStart} 
+                variant="ghost" 
+                size="sm"
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Start
+              </Button>
+            </div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 md:p-8">
+              <InterviewHistory onViewInterview={handleViewInterview} />
+            </div>
           </div>
-          <InterviewHistory onViewInterview={handleViewInterview} />
         </div>
       )}
 
       {viewMode === 'detail' && selectedInterview && (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-          <InterviewDetail 
-            interview={null}
-            sessionId={selectedInterview.session_id}
-            onBack={handleBackToHistory} 
-          />
+        <div className="relative w-full min-h-screen py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 md:p-8">
+              <InterviewDetail 
+                interview={null}
+                sessionId={selectedInterview.session_id}
+                onBack={handleBackToHistory} 
+              />
+            </div>
+          </div>
         </div>
       )}
 
@@ -292,7 +344,7 @@ const InterviewPage = () => {
           />
         </>
       )}
-    </PageContainer>
+    </div>
   );
 };
 
