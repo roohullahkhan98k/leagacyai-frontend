@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card, { CardContent } from '../components/ui/Card';
 
 const HomePage = () => {
+  const { t } = useTranslation();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
 
@@ -20,40 +22,40 @@ const HomePage = () => {
   const features = [
     {
       icon: <BrainCircuit className="h-10 w-10" />,
-      title: 'AI Interview Engine',
-      description: 'Real-time transcription with GPT-4 powered Q&A generation. Get instant answer suggestions during interviews with voice capture and screen sharing.',
+      title: t('home.aiInterviewEngine'),
+      description: t('home.aiInterviewDescription'),
       gradient: 'from-blue-500 to-cyan-500',
       bgGradient: 'from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20',
       link: '/interview'
     },
     {
       icon: <Network className="h-10 w-10" />,
-      title: 'Memory Graph Service',
-      description: 'Semantic memory relationships and visualization. Connect people, memories, events, and media in an interactive graph that shows how everything relates.',
+      title: t('home.memoryGraphService'),
+      description: t('home.memoryGraphDescription'),
       gradient: 'from-purple-500 to-pink-500',
       bgGradient: 'from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20',
       link: '/memory-graph'
     },
     {
       icon: <Mic className="h-10 w-10" />,
-      title: 'Voice Cloning & Playback',
-      description: 'Clone voices from audio samples and play back memories with familiar voices. Perfect for preserving family stories and creating personalized audio experiences.',
+      title: t('home.voiceCloningPlayback'),
+      description: t('home.voiceCloningDescription'),
       gradient: 'from-orange-500 to-red-500',
       bgGradient: 'from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20',
       link: '/voice-cloning'
     },
     {
       icon: <User className="h-10 w-10" />,
-      title: 'Avatar Service',
-      description: 'Generate 3D avatars from photos. Automated rigging and lip sync for animated conversations that bring memories to life.',
+      title: t('home.avatarService'),
+      description: t('home.avatarServiceDescription'),
       gradient: 'from-green-500 to-emerald-500',
       bgGradient: 'from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20',
       link: '/avatar-service'
     },
     {
       icon: <Image className="h-10 w-10" />,
-      title: 'Multimedia Upload & Linking',
-      description: 'Drag-and-drop media upload with auto-tagging. Link photos and videos to memory nodes with metadata enrichment.',
+      title: t('home.multimediaUploadLinking'),
+      description: t('home.multimediaDescription'),
       gradient: 'from-indigo-500 to-violet-500',
       bgGradient: 'from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20',
       link: '/multimedia'
@@ -61,29 +63,29 @@ const HomePage = () => {
   ];
 
   const stats = [
-    { label: 'AI Interviews', value: '10,000+', icon: <BrainCircuit className="h-6 w-6" />, color: 'text-blue-500' },
-    { label: 'Voice Clones', value: '500+', icon: <Mic className="h-6 w-6" />, color: 'text-orange-500' },
-    { label: 'Memory Nodes', value: '50,000+', icon: <Network className="h-6 w-6" />, color: 'text-purple-500' },
-    { label: 'Active Users', value: '2,500+', icon: <Users className="h-6 w-6" />, color: 'text-green-500' }
+    { label: t('home.aiInterviews'), value: '10,000+', icon: <BrainCircuit className="h-6 w-6" />, color: 'text-blue-500' },
+    { label: t('home.voiceClones'), value: '500+', icon: <Mic className="h-6 w-6" />, color: 'text-orange-500' },
+    { label: t('home.memoryNodes'), value: '50,000+', icon: <Network className="h-6 w-6" />, color: 'text-purple-500' },
+    { label: t('home.activeUsers'), value: '2,500+', icon: <Users className="h-6 w-6" />, color: 'text-green-500' }
   ];
 
   const benefits = [
     {
       icon: <Zap className="h-8 w-8" />,
-      title: 'Real-time AI Assistance',
-      description: 'Get instant help during interviews with live transcription and smart suggestions powered by advanced AI.',
+      title: t('home.realtimeAIAssistance'),
+      description: t('home.realtimeAIDescription'),
       gradient: 'from-yellow-400 to-orange-500'
     },
     {
       icon: <Shield className="h-8 w-8" />,
-      title: 'Privacy First',
-      description: 'Your data stays secure with enterprise-grade encryption and local processing options for maximum privacy.',
+      title: t('home.privacyFirst'),
+      description: t('home.privacyFirstDescription'),
       gradient: 'from-blue-400 to-indigo-500'
     },
     {
       icon: <Globe className="h-8 w-8" />,
-      title: 'Multi-platform',
-      description: 'Works seamlessly across web browsers, mobile devices, and desktop applications with responsive design.',
+      title: t('home.multiPlatform'),
+      description: t('home.multiPlatformDescription'),
       gradient: 'from-green-400 to-teal-500'
     }
   ];
@@ -111,21 +113,20 @@ const HomePage = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-sm">
             <Sparkles className="h-4 w-4 text-blue-500" />
             <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Next-Generation AI Platform
+              {t('home.badge')}
             </span>
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Legacy AI
+              {t('home.title')}
             </span>
             <br />
-            <span className="text-gray-900 dark:text-white">Platform</span>
+            <span className="text-gray-900 dark:text-white">{t('home.subtitle')}</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Transform how you capture, preserve, and interact with memories using cutting-edge AI technology. 
-            Experience the future of digital legacy preservation.
+            {t('home.description')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -138,7 +139,7 @@ const HomePage = () => {
                 });
               }}
             >
-              Get Started
+              {t('home.getStarted')}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
             <Button 
@@ -151,7 +152,7 @@ const HomePage = () => {
                 });
               }}
             >
-              Explore Features
+              {t('home.exploreFeatures')}
             </Button>
           </div>
 
@@ -159,15 +160,15 @@ const HomePage = () => {
           <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <span>Enterprise Ready</span>
+              <span>{t('home.enterpriseReady')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <span>99.9% Uptime</span>
+              <span>{t('home.uptime')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <span>Secure & Private</span>
+              <span>{t('home.securePrivate')}</span>
             </div>
           </div>
         </div>
@@ -205,13 +206,13 @@ const HomePage = () => {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
               <TrendingUp className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Platform Features</span>
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">{t('home.platformFeatures')}</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Powerful AI Capabilities
+              {t('home.powerfulAICapabilities')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Explore our comprehensive suite of AI-powered tools designed to enhance your digital experience and preserve your legacy.
+              {t('home.featuresDescription')}
             </p>
           </div>
 
@@ -274,7 +275,7 @@ const HomePage = () => {
                       </p>
                       
                       <div className={`flex items-center ${colors.text} font-medium group-hover:translate-x-2 transition-all duration-300`}>
-                        Learn more
+                        {t('home.learnMore')}
                         <ArrowRight className="h-5 w-5 ml-2 group-hover:scale-110 transition-transform duration-300" />
                       </div>
                     </CardContent>
@@ -291,10 +292,10 @@ const HomePage = () => {
         <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Why Choose Legacy AI?
+              {t('home.whyChoose')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Built with cutting-edge technology and user experience in mind, designed for the future.
+              {t('home.whyChooseDescription')}
             </p>
           </div>
           
@@ -325,19 +326,19 @@ const HomePage = () => {
         <div className="relative w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-16 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
             <Sparkles className="h-4 w-4 text-purple-500" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Ready to get started?</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('home.readyToGetStarted')}</span>
           </div>
           
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Experience the Future
+              {t('home.experienceTheFuture')}
             </span>
             <br />
-            <span className="text-gray-900 dark:text-white">of AI-Powered Legacy</span>
+            <span className="text-gray-900 dark:text-white">{t('home.ofAIPoweredLegacy')}</span>
           </h2>
           
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
-            Join thousands of users who are already transforming how they preserve and interact with their memories.
+            {t('home.joinThousands')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -350,7 +351,7 @@ const HomePage = () => {
                 });
               }}
             >
-              Start Free Trial
+              {t('home.startFreeTrial')}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
             <Button 
@@ -358,7 +359,7 @@ const HomePage = () => {
               variant="outline"
               className="text-lg px-10 py-4 border-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300"
             >
-              Schedule Demo
+              {t('home.scheduleDemo')}
             </Button>
           </div>
         </div>

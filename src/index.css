@@ -47,6 +47,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* RTL Support - Only for content text, not UI layout */
+.rtl-content {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-content .text-left {
+  text-align: right;
+}
+
+.rtl-content .text-right {
+  text-align: left;
+}
+
 body {
   @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50;
 }

@@ -5,6 +5,7 @@ import {
   BarChart3, AlertCircle, Zap, RefreshCcw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 import MediaUploader from '../../components/multimedia/MediaUploader';
 import MediaGallery from '../../components/multimedia/MediaGallery';
@@ -19,6 +20,7 @@ import Card from '../../components/ui/Card';
 type TabType = 'dashboard' | 'upload' | 'gallery' | 'nodes' | 'linking' | 'links' | 'insights';
 
 const MultimediaPage = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
   const [selectedNode, setSelectedNode] = useState<MemoryNode | null>(null);
@@ -172,7 +174,7 @@ const MultimediaPage = () => {
       }));
     }
     setActiveTab('gallery');
-    toast.success(`${files.length} files uploaded successfully`, { position: 'top-right', autoClose: 3000 });
+    toast.success(t('multimedia.filesUploaded', { count: files.length }), { position: 'top-right', autoClose: 3000 });
   }, []);
 
   const handleUploadError = useCallback((error: string) => {
@@ -190,13 +192,13 @@ const MultimediaPage = () => {
   }, []);
 
   const tabs = [
-    { id: 'dashboard' as TabType, label: 'Dashboard', icon: Home, description: 'Overview & Insights' },
-    { id: 'upload' as TabType, label: 'Upload', icon: Upload, description: 'Add New Media' },
-    { id: 'gallery' as TabType, label: 'Gallery', icon: Grid3X3, description: 'Browse Media' },
-    { id: 'nodes' as TabType, label: 'Memories', icon: Brain, description: 'Memory Nodes' },
-    { id: 'linking' as TabType, label: 'Linking', icon: Link2, description: 'Connect Media' },
-    { id: 'links' as TabType, label: 'Links', icon: Link2, description: 'View All Links' },
-    { id: 'insights' as TabType, label: 'Insights', icon: BarChart3, description: 'Analytics' },
+    { id: 'dashboard' as TabType, label: t('multimedia.dashboard'), icon: Home, description: t('multimedia.dashboardDescription') },
+    { id: 'upload' as TabType, label: t('multimedia.upload'), icon: Upload, description: t('multimedia.uploadDescription') },
+    { id: 'gallery' as TabType, label: t('multimedia.gallery'), icon: Grid3X3, description: t('multimedia.galleryDescription') },
+    { id: 'nodes' as TabType, label: t('multimedia.memories'), icon: Brain, description: t('multimedia.nodesDescription') },
+    { id: 'linking' as TabType, label: t('multimedia.linking'), icon: Link2, description: t('multimedia.linkingDescription') },
+    { id: 'links' as TabType, label: t('multimedia.links'), icon: Link2, description: t('multimedia.linksDescription') },
+    { id: 'insights' as TabType, label: t('multimedia.insights'), icon: BarChart3, description: t('multimedia.insightsDescription') },
   ];
 
   const renderDashboard = () => (
@@ -206,23 +208,23 @@ const MultimediaPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Dashboard Overview
+              {t('multimedia.dashboardOverview')}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
-              Organize your media files and create meaningful connections with memory nodes
+              {t('multimedia.organizeDescription')}
             </p>
             <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center space-x-1">
                 <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Auto-tagging & Metadata</span>
+                <span>{t('multimedia.autoTagging')}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Link2 className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                <span>Smart Linking</span>
+                <span>{t('multimedia.smartLinking')}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                <span>Memory Organization</span>
+                <span>{t('multimedia.memoryOrganization')}</span>
               </div>
             </div>
           </div>
@@ -239,7 +241,7 @@ const MultimediaPage = () => {
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Media</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('multimedia.totalMedia')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalMedia}</p>
             </div>
             <div className="p-3 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-full">
@@ -251,7 +253,7 @@ const MultimediaPage = () => {
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Memory Nodes</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('multimedia.memoryNodes')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalNodes}</p>
             </div>
             <div className="p-3 bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 rounded-full">
@@ -263,7 +265,7 @@ const MultimediaPage = () => {
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Linked Media</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('multimedia.linkedMedia')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.linkedMedia}</p>
             </div>
             <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full">
@@ -275,7 +277,7 @@ const MultimediaPage = () => {
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Unlinked Media</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('multimedia.unlinkedMedia')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.unlinkedMedia}</p>
             </div>
             <div className="p-3 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-full">
@@ -288,10 +290,10 @@ const MultimediaPage = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Zap className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-            Quick Actions
-          </h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <Zap className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              {t('multimedia.quickActions')}
+            </h3>
           <div className="space-y-3">
             <button
               onClick={() => setActiveTab('upload')}
@@ -299,7 +301,7 @@ const MultimediaPage = () => {
             >
               <div className="flex items-center space-x-3">
                 <Upload className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Upload Media Files</span>
+                <span className="font-medium text-gray-900 dark:text-white">{t('multimedia.uploadMediaFiles')}</span>
               </div>
               <ArrowLeft className="h-4 w-4 text-indigo-400 rotate-180" />
             </button>
@@ -310,7 +312,7 @@ const MultimediaPage = () => {
             >
               <div className="flex items-center space-x-3">
                 <Brain className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Create Memory Node</span>
+                <span className="font-medium text-gray-900 dark:text-white">{t('multimedia.createMemoryNode')}</span>
               </div>
               <ArrowLeft className="h-4 w-4 text-violet-400 rotate-180" />
             </button>
@@ -321,7 +323,7 @@ const MultimediaPage = () => {
             >
               <div className="flex items-center space-x-3">
                 <Link2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Link Media to Memories</span>
+                <span className="font-medium text-gray-900 dark:text-white">{t('multimedia.linkMediaToMemories')}</span>
               </div>
               <ArrowLeft className="h-4 w-4 text-purple-400 rotate-180" />
             </button>
@@ -332,7 +334,7 @@ const MultimediaPage = () => {
             >
               <div className="flex items-center space-x-3">
                 <Link2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                <span className="font-medium text-gray-900 dark:text-white">View All Links</span>
+                <span className="font-medium text-gray-900 dark:text-white">{t('multimedia.viewAllLinks')}</span>
               </div>
               <ArrowLeft className="h-4 w-4 text-indigo-400 rotate-180" />
             </button>
@@ -340,10 +342,10 @@ const MultimediaPage = () => {
         </Card>
 
         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <TrendingUp className="h-5 w-5 mr-2 text-violet-600 dark:text-violet-400" />
-            Recent Activity
-          </h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2 text-violet-600 dark:text-violet-400" />
+              {t('multimedia.recentActivity')}
+            </h3>
           <div className="space-y-3">
             {stats.recentActivity.length > 0 ? (
               stats.recentActivity.slice(0, 5).map((activity, index) => (
@@ -360,7 +362,7 @@ const MultimediaPage = () => {
             ) : (
               <div className="text-center py-8">
                 <Clock className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-500 dark:text-gray-400">No recent activity</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('multimedia.noRecentActivity')}</p>
               </div>
             )}
           </div>
@@ -387,10 +389,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Upload Media Files
+                {t('multimedia.uploadMediaFilesTitle')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Upload images and videos with automatic metadata extraction
+                {t('multimedia.uploadDescriptionText')}
               </p>
             </div>
             <MediaUploader
@@ -413,10 +415,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Media Gallery
+                {t('multimedia.mediaGallery')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Browse and manage your uploaded media files
+                {t('multimedia.browseDescription')}
               </p>
             </div>
             <MediaGallery 
@@ -440,10 +442,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Memory Nodes
+                {t('multimedia.memoryNodesTitle')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Create and manage memory nodes to organize your media
+                {t('multimedia.nodesDescriptionText')}
               </p>
             </div>
             <MemoryNodeManager onNodeSelect={handleNodeSelect} />
@@ -463,10 +465,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Link Media to Memories
+                {t('multimedia.linkMediaTitle')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Connect your media files to memory nodes to create rich relationships
+                {t('multimedia.linkDescriptionText')}
               </p>
             </div>
             <MediaLinker
@@ -496,7 +498,7 @@ const MultimediaPage = () => {
                     linkedMedia,
                     unlinkedMedia,
                     recentActivity: [
-                      { action: 'Media linked to memory node', time: 'Just now' },
+                      { action: t('multimedia.mediaLinked'), time: 'Just now' },
                       ...prev.recentActivity.slice(0, 4)
                     ]
                   }));
@@ -521,10 +523,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                All Links Overview
+                {t('multimedia.allLinksOverview')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                View and manage all connections between your media and memory nodes
+                {t('multimedia.linksDescriptionText')}
               </p>
             </div>
             <LinksOverview onDataRefresh={handleDataRefresh} />
@@ -545,10 +547,10 @@ const MultimediaPage = () => {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Analytics & Insights
+                {t('multimedia.analyticsInsights')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Discover patterns and insights in your media collection
+                {t('multimedia.analyticsDescription')}
               </p>
             </div>
             
@@ -578,7 +580,7 @@ const MultimediaPage = () => {
             className="inline-flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 mb-6 transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
+            {t('multimedia.backToHome')}
           </Link>
           
           <div className="mb-8">
@@ -592,11 +594,11 @@ const MultimediaPage = () => {
               <div>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                   <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
-                    Multimedia Management
+                    {t('multimedia.title')}
                   </span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                  Upload, Organize & Link Media
+                  {t('multimedia.subtitle')}
                 </p>
               </div>
             </div>

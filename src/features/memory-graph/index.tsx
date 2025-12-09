@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Network, RefreshCw, Search, Upload, Plus, X, Maximize2, User, Calendar, Tag, Image as ImageIcon, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Network, RefreshCw, Search, Upload, Plus, X, Maximize2, User, Calendar, Tag, Image as ImageIcon, FileText, Globe } from 'lucide-react';
 import PageContainer from '../../components/layout/PageContainer';
 import Button from '../../components/ui/Button';
 import { cn } from '../../utils/cn';
-import type { GraphResponse, GraphNode } from '../../services/memoryGraphApi';
+import type { GraphResponse, GraphNode, LanguageInfo } from '../../services/memoryGraphApi';
 import { createMemory, deleteMemory, getGraph, searchMemories, uploadMedia, updateMemory } from '../../services/memoryGraphApi';
 import DraggablePanel from '../../components/ui/DraggablePanel';
 import FloatingPanel from '../../components/ui/FloatingPanel';
@@ -13,6 +14,7 @@ import ProfessionalMemoryGraph from '../../components/multimedia/ProfessionalMem
 import { toast } from 'react-toastify';
 
 const MemoryGraphPage = () => {
+  const { t } = useTranslation();
   const [graph, setGraph] = useState<GraphResponse | null>(null);
   const [loadingGraph, setLoadingGraph] = useState(false);
   const [query, setQuery] = useState('');
@@ -123,7 +125,7 @@ const MemoryGraphPage = () => {
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error(e);
-      toast.error(e.message || 'Failed to search memories', {
+      toast.error(e.message || t('memory.failedToSearch'), {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -177,7 +179,7 @@ const MemoryGraphPage = () => {
       if (selectedFiles.length) {
         const up = await uploadMedia(selectedFiles);
         mediaPaths = up.files.map(f => f.path);
-        toast.success(`Uploaded ${up.files.length} file(s)`, {
+        toast.success(t('memory.uploadedFiles', { count: up.files.length }), {
           position: 'top-right',
           autoClose: 2000,
         });
@@ -189,8 +191,11 @@ const MemoryGraphPage = () => {
         tags: newMemory.tags.split(',').map(t => t.trim()).filter(Boolean),
         media: mediaPaths,
       };
-      await createMemory(payload);
-      toast.success('Memory created successfully!', {
+      const result = await createMemory(payload);
+      const languageMsg = result.language 
+        ? ` (${t('memory.languageLabel')}: ${result.language.name}${result.language.isRTL ? `, ${t('memory.rtl')}` : ''})`
+        : '';
+      toast.success(`${t('memory.memoryCreated')}${languageMsg}`, {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -200,7 +205,7 @@ const MemoryGraphPage = () => {
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error(e);
-      toast.error(e.message || 'Failed to create memory', {
+      toast.error(e.message || t('memory.failedToCreate'), {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -244,7 +249,10 @@ const MemoryGraphPage = () => {
       const res = await updateMemory(activeMemory.id, payload);
       // eslint-disable-next-line no-console
       console.log('saveEdit:response', res);
-      toast.success('Memory updated successfully!', {
+      const languageMsg = res.language 
+        ? ` (${t('memory.languageLabel')}: ${res.language.name}${res.language.isRTL ? `, ${t('memory.rtl')}` : ''})`
+        : '';
+      toast.success(`${t('memory.memoryUpdated')}${languageMsg}`, {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -254,7 +262,7 @@ const MemoryGraphPage = () => {
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error('saveEdit:error', e);
-      toast.error(e.message || 'Failed to update memory', {
+      toast.error(e.message || t('memory.failedToUpdate'), {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -268,7 +276,7 @@ const MemoryGraphPage = () => {
     try {
       setIsDeleting(true);
       await deleteMemory(activeMemory.id);
-      toast.success('Memory deleted successfully', {
+      toast.success(t('memory.memoryDeleted'), {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -278,7 +286,7 @@ const MemoryGraphPage = () => {
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error(e);
-      toast.error(e.message || 'Failed to delete memory', {
+      toast.error(e.message || t('memory.failedToDelete'), {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -301,15 +309,15 @@ const MemoryGraphPage = () => {
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <Network className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold">Memory Graph</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">{t('memory.title')}</h1>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={() => setShowCreatePanel(true)} className="flex-1 sm:flex-initial bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105">
-              <Plus className="h-4 w-4 mr-2" /> <span className="hidden sm:inline">Add Memory</span><span className="sm:hidden">Add</span>
+              <Plus className="h-4 w-4 mr-2" /> <span className="hidden sm:inline">{t('memory.addMemory')}</span><span className="sm:hidden">{t('common.create')}</span>
             </Button>
             <Button variant="primary" size="sm" onClick={loadGraph} disabled={loadingGraph} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
               <RefreshCw className={cn('h-4 w-4', loadingGraph && 'animate-spin')} />
-              <span className="hidden sm:inline ml-2">Refresh</span>
+              <span className="hidden sm:inline ml-2">{t('common.refresh')}</span>
             </Button>
           </div>
         </div>
@@ -324,7 +332,7 @@ const MemoryGraphPage = () => {
                   onChange={e => focusGraphForMemory(e.target.value)}
                   style={{ maxWidth: '100%' }}
                 >
-                  <option value="">Select a memory to view graph…</option>
+                  <option value="">{t('memory.selectMemory')}</option>
                   {availableMemories.map(m => (
                     <option key={m.id} value={m.id} title={m.label}>{m.label}</option>
                   ))}
@@ -341,8 +349,8 @@ const MemoryGraphPage = () => {
                       <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-gray-900">
                         <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                           <Network className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                          <div className="mb-2 font-semibold">No data to display</div>
-                          <div>Select a memory from the list above to render its graph.</div>
+                          <div className="mb-2 font-semibold">{t('memory.noData')}</div>
+                          <div>{t('memory.selectMemoryToRender')}</div>
                         </div>
                       </div>
                     ) : (
@@ -358,13 +366,13 @@ const MemoryGraphPage = () => {
           </div>
           <div className="space-y-4 lg:space-y-6 order-1 lg:order-2">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-              <h3 className="font-semibold mb-3 flex items-center text-sm sm:text-base"><Search className="h-4 w-4 mr-2" /> Semantic Search</h3>
+              <h3 className="font-semibold mb-3 flex items-center text-sm sm:text-base"><Search className="h-4 w-4 mr-2" /> {t('memory.semanticSearch')}</h3>
               <div className="space-y-3">
                 <div className="relative">
                   <Search className={cn('h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400', searching && 'animate-pulse')} />
                   <input
                     className="w-full pl-9 pr-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Search memories (semantic)…"
+                    placeholder={t('memory.searchPlaceholder')}
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !searching) onSearch(); }}
@@ -373,34 +381,45 @@ const MemoryGraphPage = () => {
                 </div>
                 <input
                   className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="Filter by person"
+                  placeholder={t('memory.filterByPerson')}
                   value={personFilter}
                   onChange={e => setPersonFilter(e.target.value)}
                 />
                 <div className="flex justify-end">
                   <Button size="sm" onClick={onSearch} disabled={searching} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                     <Search className={cn('h-4 w-4 mr-2', searching && 'animate-spin')} />
-                    {searching ? 'Searching...' : 'Search'}
+                    {searching ? t('common.loading') : t('common.search')}
                   </Button>
                 </div>
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-              <h3 className="font-semibold mb-3 text-sm sm:text-base">Results</h3>
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">{t('memory.results')}</h3>
               <div className="space-y-3 overflow-y-auto max-h-[300px] sm:max-h-[400px] p-1">
                 {searchResults.length === 0 ? (
-                  <p className="text-sm text-gray-500">No results yet. Try searching.</p>
+                  <p className="text-sm text-gray-500">{t('memory.noResults')}</p>
                 ) : searchResults.map((r, i) => {
                   const meta: any = r.meta || {};
                   const tags = parseArrayFromUnknown(meta.tags);
                   const media = parseArrayFromUnknown(meta.media);
+                  const language: LanguageInfo | undefined = meta.language 
+                    ? (typeof meta.language === 'string' 
+                        ? { code: meta.language, name: meta.language, isRTL: false }
+                        : meta.language)
+                    : undefined;
                   const isExpanded = expandedResults.has(i);
                   const displayText = isExpanded ? r.doc : truncateText(r.doc);
                   return (
                     <div key={i} className="p-3 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 select-none">
                       <p 
-                        className="text-sm font-medium mb-2 leading-snug cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors break-words"
-                        style={{ wordBreak: 'break-word', maxWidth: '100%' }}
+                        className={cn(
+                          "text-sm font-medium mb-2 leading-snug cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors break-words",
+                          language?.isRTL && 'rtl-content'
+                        )}
+                        style={{ 
+                          wordBreak: 'break-word', 
+                          maxWidth: '100%'
+                        }}
                         onClick={(e) => {
                           e.stopPropagation();
                           setExpandedResults(prev => {
@@ -419,25 +438,39 @@ const MemoryGraphPage = () => {
                       <div onClick={() => focusGraphForMemory(r.id)} className="cursor-pointer">
                       <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Person: </span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.personLabel')}: </span>
                           <span>{meta.person ?? '-'}</span>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Event: </span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.eventLabel')}: </span>
                           <span>{meta.event ?? '-'}</span>
                         </div>
+                        {language && (
+                          <div className="col-span-2 flex items-center gap-1">
+                            <Globe className="h-3 w-3 text-blue-500" />
+                            <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.languageLabel')}: </span>
+                            <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                              {language.name || language.code}
+                            </span>
+                            {language.isRTL && (
+                              <span className="px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[10px]">
+                                {t('memory.rtl')}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <div className="col-span-2">
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Tags: </span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.tagsLabel')}: </span>
                           {tags.length ? (
                             <span className="inline-flex flex-wrap gap-1">
-                              {tags.map((t: string, idx: number) => (
-                                <span key={idx} className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">{t}</span>
+                              {tags.map((tag: string, idx: number) => (
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">{tag}</span>
                               ))}
                 </span>
                           ) : <span>-</span>}
                         </div>
                         <div className="col-span-2">
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Media: </span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.mediaLabel')}: </span>
                           {media.length ? (
                             <div className="mt-1 grid grid-cols-3 gap-2">
                               {media.slice(0,3).map((m: string, idx: number) => {
@@ -458,8 +491,8 @@ const MemoryGraphPage = () => {
                         </div>
                       </div>
                       <div className="mt-2 flex gap-2">
-                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openEditModal(r); }} className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">Edit</Button>
-                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDeleteModal(r); }} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Delete</Button>
+                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openEditModal(r); }} className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">{t('common.edit')}</Button>
+                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDeleteModal(r); }} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">{t('common.delete')}</Button>
                       </div>
                       </div>
                     </div>
@@ -473,31 +506,31 @@ const MemoryGraphPage = () => {
       {showCreatePanel && (
         <FloatingPanel position="bottom-right" onClose={() => setShowCreatePanel(false)}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold flex items-center"><Plus className="h-4 w-4 mr-2" /> Add Memory</h3>
+            <h3 className="font-semibold flex items-center"><Plus className="h-4 w-4 mr-2" /> {t('memory.addMemory')}</h3>
             <button className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" onClick={() => setShowCreatePanel(false)}><X className="h-4 w-4" /></button>
           </div>
           <div className="space-y-3">
             <textarea
               className="w-full min-h-[80px] px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Document (memory text)"
+              placeholder={t('memory.documentPlaceholder')}
               value={newMemory.document}
               onChange={e => setNewMemory(v => ({ ...v, document: e.target.value }))}
             />
             <input
               className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Person (required)"
+              placeholder={t('memory.personPlaceholder')}
               value={newMemory.person}
               onChange={e => setNewMemory(v => ({ ...v, person: e.target.value }))}
             />
             <input
               className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Event (optional)"
+              placeholder={t('memory.eventPlaceholder')}
               value={newMemory.event}
               onChange={e => setNewMemory(v => ({ ...v, event: e.target.value }))}
             />
             <input
               className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Tags (comma separated)"
+              placeholder={t('memory.tagsPlaceholder')}
               value={newMemory.tags}
               onChange={e => setNewMemory(v => ({ ...v, tags: e.target.value }))}
             />
@@ -529,7 +562,7 @@ const MemoryGraphPage = () => {
               )}
             </div>
             <Button onClick={async () => { await onCreateMemory(); setShowCreatePanel(false); }} disabled={creating || !newMemory.document.trim() || !newMemory.person.trim()} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
-              <Plus className={cn('h-4 w-4 mr-2', creating && 'animate-spin')} /> Create
+              <Plus className={cn('h-4 w-4 mr-2', creating && 'animate-spin')} /> {t('common.create')}
             </Button>
         </div>
         </FloatingPanel>
@@ -539,16 +572,16 @@ const MemoryGraphPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => !isSaving && setIsEditOpen(false)} />
           <div className="relative w-full max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="text-lg font-semibold mb-3">Edit Memory</h3>
+            <h3 className="text-lg font-semibold mb-3">{t('memory.editMemory')}</h3>
             <div className="space-y-3">
               <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" disabled value={activeMemory.id} />
               <textarea className="w-full min-h-[80px] px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.document} onChange={e => setActiveMemory(v => ({ ...v, document: e.target.value }))} />
               <div className="grid grid-cols-2 gap-2">
-                <input className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.person} onChange={e => setActiveMemory(v => ({ ...v, person: e.target.value }))} placeholder="Person" />
-                <input className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.event} onChange={e => setActiveMemory(v => ({ ...v, event: e.target.value }))} placeholder="Event" />
+                <input className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.person} onChange={e => setActiveMemory(v => ({ ...v, person: e.target.value }))} placeholder={t('memory.personLabel')} />
+                <input className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.event} onChange={e => setActiveMemory(v => ({ ...v, event: e.target.value }))} placeholder={t('memory.eventLabel')} />
               </div>
-              <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.tags} onChange={e => setActiveMemory(v => ({ ...v, tags: e.target.value }))} placeholder="Tags (comma separated)" />
-              <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.media} onChange={e => setActiveMemory(v => ({ ...v, media: e.target.value }))} placeholder="Media paths (comma separated)" />
+              <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.tags} onChange={e => setActiveMemory(v => ({ ...v, tags: e.target.value }))} placeholder={t('memory.tagsPlaceholder')} />
+              <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" value={activeMemory.media} onChange={e => setActiveMemory(v => ({ ...v, media: e.target.value }))} placeholder={t('memory.mediaLabel')} />
               {/* Current media with remove */}
               {(() => {
                 const items = activeMemory.media.split(',').map(s => s.trim()).filter(Boolean);
@@ -626,10 +659,10 @@ const MemoryGraphPage = () => {
                 )}
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={isSaving} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Cancel</Button>
+                <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={isSaving} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">{t('common.cancel')}</Button>
                 <Button onClick={saveEdit} disabled={isSaving} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                   <RefreshCw className={cn('h-4 w-4 mr-2', isSaving && 'animate-spin')} />
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? t('common.loading') : t('common.save')}
                 </Button>
               </div>
             </div>
@@ -642,14 +675,14 @@ const MemoryGraphPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => !isDeleting && setIsDeleteOpen(false)} />
           <div className="relative w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="text-lg font-semibold mb-3">Delete Memory</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Are you sure you want to delete this memory?</p>
+            <h3 className="text-lg font-semibold mb-3">{t('memory.deleteMemory')}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('memory.confirmDelete')}</p>
             <input className="w-full px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 mb-3" disabled value={activeMemory.id} />
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">Cancel</Button>
+              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105">{t('common.cancel')}</Button>
               <Button variant="secondary" onClick={confirmDelete} disabled={isDeleting} className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg shadow-red-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                 <RefreshCw className={cn('h-4 w-4 mr-2', isDeleting && 'animate-spin')} />
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? t('common.loading') : t('common.delete')}
               </Button>
             </div>
         </div>
@@ -672,6 +705,11 @@ const MemoryGraphPage = () => {
         const event = meta.event || '';
         const tags = parseArrayFromUnknown(meta.tags);
         const media = parseArrayFromUnknown(meta.media);
+        const language: LanguageInfo | undefined = meta.language 
+          ? (typeof meta.language === 'string' 
+              ? { code: meta.language, name: meta.language, isRTL: false }
+              : meta.language)
+          : undefined;
         const isImagePath = (u: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(u);
         const isVideoPath = (u: string) => /\.(mp4|webm|ogg|mov|avi)$/i.test(u);
 
@@ -695,7 +733,7 @@ const MemoryGraphPage = () => {
                       </div>
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                          Memory Details
+                          {t('memory.memoryDetails')}
                         </h2>
                         <p className="text-sm text-gray-600 dark:text-gray-400">ID: {node.id}</p>
                       </div>
@@ -717,9 +755,11 @@ const MemoryGraphPage = () => {
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2 mb-3">
                       <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Memory</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{t('memory.document')}</h3>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    <p 
+                      className={`text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap ${language?.isRTL ? 'rtl-content' : ''}`}
+                    >
                       {document}
                     </p>
                   </div>
@@ -732,7 +772,7 @@ const MemoryGraphPage = () => {
                     <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
                       <div className="flex items-center gap-2 mb-2">
                         <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-300">Person</h4>
+                        <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-300">{t('memory.personLabel')}</h4>
                       </div>
                       <p className="text-blue-800 dark:text-blue-200">{person}</p>
                     </div>
@@ -743,9 +783,34 @@ const MemoryGraphPage = () => {
                     <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
-                        <h4 className="text-sm font-semibold text-green-900 dark:text-green-300">Event</h4>
+                        <h4 className="text-sm font-semibold text-green-900 dark:text-green-300">{t('memory.eventLabel')}</h4>
                       </div>
                       <p className="text-green-800 dark:text-green-200">{event}</p>
+                    </div>
+                  )}
+
+                  {/* Language */}
+                  {language && (
+                    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Globe className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                        <h4 className="text-sm font-semibold text-indigo-900 dark:text-indigo-300">{t('memory.languageLabel')}</h4>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-indigo-800 dark:text-indigo-200 font-medium">
+                          {language.name || language.code}
+                        </span>
+                        {language.isRTL && (
+                          <span className="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">
+                            {t('memory.rtl')}
+                          </span>
+                        )}
+                        {language.confidence !== undefined && (
+                          <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                            ({Math.round(language.confidence * 100)}% {t('memory.confidence')})
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -755,7 +820,7 @@ const MemoryGraphPage = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Tag className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Tags</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{t('memory.tagsLabel')}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag: string, idx: number) => (
@@ -775,7 +840,7 @@ const MemoryGraphPage = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <ImageIcon className="h-5 w-5 text-pink-600 dark:text-pink-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Media ({media.length})</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{t('memory.mediaLabel')} ({media.length})</h3>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {media.map((m: string, idx: number) => {
@@ -823,7 +888,7 @@ const MemoryGraphPage = () => {
                 {!document && !person && !event && tags.length === 0 && media.length === 0 && (
                   <div className="text-center py-12">
                     <FileText className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">No details available for this memory</p>
+                    <p className="text-gray-500 dark:text-gray-400">{t('memory.noData')}</p>
                   </div>
                 )}
               </div>
@@ -852,7 +917,7 @@ const MemoryGraphPage = () => {
                     }}
                     className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 transition-all duration-300 hover:scale-105"
                   >
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button 
                     variant="secondary"
@@ -865,7 +930,7 @@ const MemoryGraphPage = () => {
                     }}
                     className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg shadow-red-500/50 transition-all duration-300 hover:scale-105"
                   >
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </div>

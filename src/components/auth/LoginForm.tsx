@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,6 +13,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className }) => {
+  const { t } = useTranslation();
   const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     identifier: '',
@@ -34,11 +36,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className }) => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.identifier.trim()) {
-      newErrors.identifier = 'Email or username is required';
+      newErrors.identifier = t('auth.emailOrUsername') + ' ' + t('auth.emailRequired').toLowerCase();
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth.passwordRequired');
     }
 
     setErrors(newErrors);
@@ -59,24 +61,26 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className }) => {
   };
 
   return (
-    <Card className={className} variant="elevated">
+    <Card className={`${className} border-2 border-gray-200/50 dark:border-gray-700/50 shadow-2xl hover:shadow-3xl transition-all duration-300`} variant="elevated">
       <CardHeader className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center">
-          <LogIn className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-300">
+          <LogIn className="w-8 h-8 text-white" />
         </div>
-        <CardTitle>Welcome Back</CardTitle>
-        <CardDescription>
-          Sign in to your account to continue
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          {t('auth.welcomeBack')}
+        </CardTitle>
+        <CardDescription className="text-base">
+          {t('auth.signInToAccount')}
         </CardDescription>
       </CardHeader>
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email or Username"
+            label={t('auth.emailOrUsername')}
             name="identifier"
             type="text"
-            placeholder="Enter your email or username"
+            placeholder={t('auth.enterEmailOrUsername')}
             value={formData.identifier}
             onChange={handleInputChange}
             error={errors.identifier}
@@ -86,10 +90,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className }) => {
           />
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             name="password"
             type={showPassword ? 'text' : 'password'}
-            placeholder="Enter your password"
+            placeholder={t('auth.enterPassword')}
             value={formData.password}
             onChange={handleInputChange}
             error={errors.password}
@@ -115,17 +119,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className }) => {
             disabled={isLoading}
             leftIcon={<LogIn className="w-4 h-4" />}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? t('auth.signingIn') : t('auth.signIn')}
           </Button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              {t('auth.dontHaveAccount')}{' '}
               <Link 
                 to="/register" 
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium transition-colors"
               >
-                Sign up
+                {t('auth.signUp')}
               </Link>
             </p>
           </div>

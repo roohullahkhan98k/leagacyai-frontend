@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { LogOut, User, Menu, X, LogIn, UserPlus, Palette } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LogOut, User, Menu, X, LogIn, UserPlus, Palette, Globe } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../ui/ThemeToggle';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 import { useState, useEffect } from 'react';
 
 // Helper to get backend URL from environment
@@ -23,6 +25,7 @@ const getAvatarUrl = (avatar?: string): string | undefined => {
 };
 
 const Header = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -70,6 +73,10 @@ const Header = () => {
           
           {/* Right Section - Actions */}
           <div className="flex items-center space-x-3 md:space-x-4">
+            {/* Language Switcher */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
+            </div>
             {/* Theme Toggle */}
             <div className="hidden sm:block">
               <ThemeToggle />
@@ -109,12 +116,12 @@ const Header = () => {
                 <div className="flex items-center space-x-2">
                   <Link to="/login">
                     <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                      Login
+                      {t('header.login')}
                     </button>
                   </Link>
                   <Link to="/register">
                     <button className="px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 transform hover:scale-105">
-                      Sign Up
+                      {t('header.signUp')}
                     </button>
                   </Link>
                 </div>
@@ -165,11 +172,19 @@ const Header = () => {
 
           {/* Content */}
           <div className="p-4 space-y-4 border-t border-gray-200 dark:border-gray-700">
+            {/* Language Switcher */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Language</span>
+              </div>
+              <LanguageSwitcher />
+            </div>
             {/* Theme Toggle */}
             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Palette className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('common.theme')}</span>
               </div>
               <ThemeToggle />
             </div>
@@ -200,7 +215,7 @@ const Header = () => {
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
+                  <span>{t('header.logout')}</span>
                 </button>
               </div>
             ) : (
@@ -208,13 +223,13 @@ const Header = () => {
                 <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 rounded-lg transition-all duration-200">
                     <LogIn className="h-4 w-4" />
-                    <span>Login</span>
+                    <span>{t('header.login')}</span>
                   </button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg shadow-lg shadow-blue-500/25 transition-all duration-200">
                     <UserPlus className="h-4 w-4" />
-                    <span>Sign Up</span>
+                    <span>{t('header.signUp')}</span>
                   </button>
                 </Link>
               </div>

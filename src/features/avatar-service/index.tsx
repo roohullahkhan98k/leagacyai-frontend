@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Trash2, Play, Image, Sparkles, Video, Upload, Users, History, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/ui/Button';
 import FileUpload from '../../components/ui/FileUpload';
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -12,6 +13,7 @@ import AvatarViewModal from '../../components/avatar/AvatarViewModal';
 import { cn } from '../../utils/cn';
 
 const AvatarServicePage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [avatars, setAvatars] = useState<AvatarRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -80,13 +82,13 @@ const AvatarServicePage = () => {
 
 
   const handleDeleteAnimation = async (animationId: string) => {
-    if (!confirm('Delete this animation? This cannot be undone.')) return;
+    if (!confirm(t('avatar.deleteAnimation'))) return;
     
     setDeletingAnimationId(animationId);
     try {
       await deleteAnimation(animationId);
       setAnimations(prev => prev.filter(a => a.id !== animationId));
-      toast.success('Animation deleted successfully');
+      toast.success(t('avatar.animationDeleted'));
     } catch (e: any) {
       toast.error(e?.message || 'Failed to delete animation');
     } finally {
@@ -105,14 +107,14 @@ const AvatarServicePage = () => {
   };
 
   const handleAvatarDeleted = async (id: string) => {
-    if (!confirm('Delete this avatar and all its animations? This cannot be undone.')) return;
+    if (!confirm(t('avatar.deleteAvatarConfirm'))) return;
     
     try {
       await deleteAvatar(id);
       setAvatars(prev => prev.filter(a => a.id !== id));
       setViewModalOpen(false);
       setViewingAvatar(null);
-      toast.success('Avatar deleted successfully');
+      toast.success(t('avatar.avatarDeleted'));
       await refresh();
       await loadAnimationHistory();
     } catch (e: any) {
@@ -126,7 +128,7 @@ const AvatarServicePage = () => {
     const audioUrl = animation.audio_url ? absoluteAssetUrl(animation.audio_url) : undefined;
     
     if (!modelUrl) {
-      toast.error('Model URL not available for this animation');
+      toast.error(t('avatar.modelUrlNotAvailable'));
       return;
     }
     
@@ -186,7 +188,7 @@ const AvatarServicePage = () => {
           setImageJobStatus('completed');
           await refresh();
           if (result?.avatarId) {
-            toast.success('Avatar created successfully! Go to My Avatars tab to view it.');
+            toast.success(t('avatar.avatarCreated'));
           }
         },
         (msg) => {
@@ -217,7 +219,7 @@ const AvatarServicePage = () => {
             className="inline-flex items-center text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 mb-6 transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
+            {t('avatar.backToHome')}
           </Link>
           
           <div className="mb-8">
@@ -231,17 +233,16 @@ const AvatarServicePage = () => {
               <div>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                   <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                    Avatar Service
+                    {t('avatar.title')}
                   </span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                  3D Pipeline
+                  {t('avatar.subtitle')}
                 </p>
               </div>
             </div>
             <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
-              Upload a photo to generate a rigged 3D model. Add audio to create lipsync animations. 
-              Build realistic avatars with AI-powered technology.
+              {t('avatar.description')}
             </p>
           </div>
         </div>
@@ -267,7 +268,7 @@ const AvatarServicePage = () => {
                 )}
               >
                 <Upload className="h-5 w-5" />
-                <span className="hidden sm:inline">Create Avatar</span>
+                <span className="hidden sm:inline">{t('avatar.createAvatar')}</span>
               </button>
 
               <button
@@ -280,7 +281,7 @@ const AvatarServicePage = () => {
                 )}
               >
                 <Users className="h-5 w-5" />
-                <span className="hidden sm:inline">My Avatars</span>
+                <span className="hidden sm:inline">{t('avatar.myAvatars')}</span>
                 <span className="hidden sm:inline text-xs bg-white/20 dark:bg-white/10 px-2 py-0.5 rounded-full ml-1">
                   {avatars.length}
                 </span>
@@ -296,7 +297,7 @@ const AvatarServicePage = () => {
                 )}
               >
                 <History className="h-5 w-5" />
-                <span className="hidden sm:inline">History</span>
+                <span className="hidden sm:inline">{t('avatar.history')}</span>
                 <span className="hidden sm:inline text-xs bg-white/20 dark:bg-white/10 px-2 py-0.5 rounded-full ml-1">
                   {animations.length}
                 </span>
@@ -328,9 +329,9 @@ const AvatarServicePage = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200/50 dark:border-green-700/30">
               <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {activeTab === 'create' && 'Upload a photo to generate a rigged 3D avatar'}
-                {activeTab === 'avatars' && `View and manage your ${avatars.length} avatar${avatars.length !== 1 ? 's' : ''}`}
-                {activeTab === 'history' && `Track ${animations.length} animation${animations.length !== 1 ? 's' : ''} with lipsync`}
+                {activeTab === 'create' && t('avatar.createDescription')}
+                {activeTab === 'avatars' && t('avatar.avatarsDescription', { count: avatars.length })}
+                {activeTab === 'history' && t('avatar.historyDescription', { count: animations.length })}
               </p>
             </div>
           </div>
@@ -348,15 +349,15 @@ const AvatarServicePage = () => {
                       <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
                         <Image className="h-6 w-6 text-green-600" />
                       </div>
-                      Create 3D Avatar
+                      {t('avatar.create3DAvatar')}
                     </CardTitle>
-                    <CardDescription className="mt-2">Upload a photo to generate a rigged 3D model</CardDescription>
+                    <CardDescription className="mt-2">{t('avatar.uploadPhoto')}</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <FileUpload accept=".png,.jpg,.jpeg" maxSize={50} onFileSelect={handleImageToModel} />
                     <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('avatar.status')}:</span>
                         <span className={`text-sm font-semibold capitalize px-3 py-1 rounded-full ${
                           imageJobStatus === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                           imageJobStatus === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
@@ -368,7 +369,7 @@ const AvatarServicePage = () => {
                       </div>
                       {imageJobId && (
                         <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                          Job ID: {imageJobId}
+                          {t('avatar.jobId')}: {imageJobId}
                         </div>
                       )}
                     </div>
@@ -389,9 +390,9 @@ const AvatarServicePage = () => {
                       <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-xl">
                         <Video className="h-6 w-6 text-teal-600" />
                       </div>
-                      Add Lipsync
+                      {t('avatar.addLipsync')}
                     </CardTitle>
-                    <CardDescription className="mt-2">Choose an avatar to add audio and generate lipsync</CardDescription>
+                    <CardDescription className="mt-2">{t('avatar.chooseAvatar')}</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6">
                     {avatars.length === 0 ? (
@@ -404,14 +405,14 @@ const AvatarServicePage = () => {
                     ) : (
                       <div className="space-y-4">
                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Select Avatar
+                          {t('avatar.selectAvatar')}
                         </label>
                         <select
                           value={selectedId || ''}
                           onChange={(e) => setSelectedId(e.target.value)}
                           className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
                         >
-                          <option value="">-- Choose an avatar --</option>
+                          <option value="">{t('avatar.chooseAvatarOption')}</option>
                           {avatars.map((a) => (
                             <option key={a.id} value={a.id}>
                               {a.name || 'Untitled'} ({a.lipsync?.length || 0} animations)
@@ -428,7 +429,7 @@ const AvatarServicePage = () => {
                             className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105 py-3"
                           >
                             <Play className="h-5 w-5 mr-2" />
-                            Open Avatar Details
+                            {t('avatar.openAvatarDetails')}
                           </Button>
                         )}
                       </div>
@@ -444,20 +445,20 @@ const AvatarServicePage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">
-                          Quick Guide
+                          {t('avatar.quickGuide')}
                         </h3>
                         <ol className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
                           <li className="flex items-start gap-2">
                             <span className="font-semibold text-green-600">1.</span>
-                            <span>Upload a photo to create your 3D avatar</span>
+                            <span>{t('avatar.guideStep1')}</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <span className="font-semibold text-green-600">2.</span>
-                            <span>Select an avatar from the dropdown</span>
+                            <span>{t('avatar.guideStep2')}</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <span className="font-semibold text-green-600">3.</span>
-                            <span>Open details to add audio and generate lipsync</span>
+                            <span>{t('avatar.guideStep3')}</span>
                           </li>
                         </ol>
                         <div className="mt-6">
@@ -467,7 +468,7 @@ const AvatarServicePage = () => {
                             className="w-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200/50 dark:border-green-700/30 hover:from-green-100 hover:to-emerald-100 transition-all duration-300"
                           >
                             <Users className="h-4 w-4 mr-2" />
-                            Browse All Avatars ({avatars.length})
+                            {t('avatar.browseAllAvatars')} ({avatars.length})
                           </Button>
                         </div>
                       </div>
@@ -489,9 +490,9 @@ const AvatarServicePage = () => {
                       <Users className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Avatars</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('avatar.myAvatars')}</h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {avatars.length} avatar{avatars.length !== 1 ? 's' : ''} total
+                        {t('avatar.avatarsTotal', { count: avatars.length })}
                       </p>
                     </div>
                   </div>
@@ -500,7 +501,7 @@ const AvatarServicePage = () => {
                     className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105"
                   >
                     <Upload className="h-4 w-4 mr-2" />
-                    Create New
+                    {t('avatar.createNew')}
                   </Button>
                 </div>
               </div>
@@ -509,23 +510,23 @@ const AvatarServicePage = () => {
               {loading ? (
                 <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-12 text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-200 border-t-green-600 mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">Loading avatars...</p>
+                  <p className="text-gray-600 dark:text-gray-400">{t('avatar.loadingAvatars')}</p>
                 </div>
               ) : avatars.length === 0 ? (
                 <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-16 text-center">
                   <Users className="h-20 w-20 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-                    No avatars yet
+                    {t('avatar.noAvatarsYet')}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                    Get started by creating your first 3D avatar. Upload a photo and let AI generate a rigged model for you.
+                    {t('avatar.getStartedDescription')}
                   </p>
                   <Button 
                     onClick={() => setActiveTab('create')} 
                     className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105 px-8 py-3"
                   >
                     <Upload className="h-5 w-5 mr-2" />
-                    Create Your First Avatar
+                    {t('avatar.createFirstAvatar')}
                   </Button>
                 </div>
               ) : (
@@ -574,7 +575,7 @@ const AvatarServicePage = () => {
                             className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105"
                           >
                             <Play className="h-4 w-4 mr-2" />
-                            View
+                            {t('avatar.view')}
                           </Button>
                           
                           <Button
@@ -604,9 +605,9 @@ const AvatarServicePage = () => {
                       <Video className="h-6 w-6 text-teal-600" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Animation History</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('avatar.animationHistory')}</h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {animations.length} animation{animations.length !== 1 ? 's' : ''} total
+                        {t('avatar.animationsTotal', { count: animations.length })}
                       </p>
                     </div>
                   </div>
@@ -618,23 +619,23 @@ const AvatarServicePage = () => {
                 {animationsLoading ? (
                   <div className="py-12 text-center">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-200 border-t-green-600 mb-4"></div>
-                    <p className="text-gray-600 dark:text-gray-400">Loading animations...</p>
+                    <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
                   </div>
                 ) : animations.length === 0 ? (
                   <div className="py-16 text-center">
                     <Video className="h-20 w-20 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-                      No animations yet
+                      {t('avatar.noAnimationsYet')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
-                      Create avatars and add lipsync animations to see them here. Each animation will be tracked in your history.
+                      {t('avatar.createAnimationsDescription')}
                     </p>
                     <Button 
                       onClick={() => setActiveTab('create')} 
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105 px-8 py-3"
                     >
                       <Upload className="h-5 w-5 mr-2" />
-                      Create Avatar
+                      {t('avatar.createAvatar')}
                     </Button>
                   </div>
                 ) : (
@@ -705,7 +706,7 @@ const AvatarServicePage = () => {
                                   disabled={isDeleting}
                                 >
                                   <Play className="h-4 w-4 mr-2" />
-                                  Play
+                                  {t('avatar.play')}
                                 </Button>
                               )}
                               

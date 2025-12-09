@@ -1,5 +1,12 @@
 export type MemoryNodeType = 'person' | 'memory' | 'event' | 'tag' | 'media';
 
+export type LanguageInfo = {
+  code: string;
+  name: string;
+  confidence?: number;
+  isRTL?: boolean;
+};
+
 export type GraphNode = { id: string; label: string; type: MemoryNodeType; data: Record<string, unknown> };
 export type GraphEdge = { source: string; target: string; label: string };
 export type GraphResponse = { nodes: GraphNode[]; edges: GraphEdge[]; count: number };
@@ -24,6 +31,19 @@ export type CreateMemoryRequest = {
   createdAt?: string;
 };
 
+export type CreateMemoryResponse = {
+  ok: boolean;
+  id: string;
+  language?: LanguageInfo;
+};
+
+export type UpdateMemoryResponse = {
+  ok: boolean;
+  id: string;
+  tags?: string[];
+  language?: LanguageInfo;
+};
+
 import { authService } from './authService';
 
 const rawBackendUrl = (import.meta as any).env?.VITE_BACKEND_URL as string | undefined;
@@ -46,7 +66,7 @@ export async function createMemory(payload: CreateMemoryRequest) {
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
-  return res.json() as Promise<{ ok: boolean; id: string }>;
+  return res.json() as Promise<CreateMemoryResponse>;
 }
 
 export async function addTags(memoryId: string, tags: string[]) {
@@ -56,7 +76,7 @@ export async function addTags(memoryId: string, tags: string[]) {
     body: JSON.stringify({ tags }),
   });
   if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
-  return res.json() as Promise<{ ok: boolean; id: string; tags: string[] }>;
+  return res.json() as Promise<UpdateMemoryResponse>;
 }
 
 export async function updateMemory(
@@ -69,7 +89,7 @@ export async function updateMemory(
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
-  return res.json() as Promise<{ ok: boolean; id: string; tags?: string[] }>;
+  return res.json() as Promise<UpdateMemoryResponse>;
 }
 
 export async function deleteMemory(memoryId: string) {

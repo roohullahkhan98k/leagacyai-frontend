@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mic, ArrowLeft, CheckCircle, Sparkles, Volume2, Settings, User, History, Zap, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/ui/Button';
 import VoiceRecorder from '../../components/voice-cloning/VoiceRecorder';
 import VoiceCloner from '../../components/voice-cloning/VoiceCloner';
@@ -13,6 +14,7 @@ import { checkHealth } from '../../services/voiceCloningApi';
 type ActiveTab = 'record' | 'clone' | 'speak' | 'manage' | 'custom' | 'history';
 
 const VoiceCloningPage = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ActiveTab>('record');
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -75,44 +77,44 @@ const VoiceCloningPage = () => {
   const tabs = [
     {
       id: 'record' as ActiveTab,
-      label: 'Record Voice',
+      label: t('voiceCloning.recordVoice'),
       icon: Mic,
-      description: 'Record or upload your voice sample',
+      description: t('voiceCloning.recordDescription'),
       disabled: false
     },
     {
       id: 'clone' as ActiveTab,
-      label: 'Clone Voice',
+      label: t('voiceCloning.cloneVoice'),
       icon: Sparkles,
-      description: 'Create your digital voice clone',
+      description: t('voiceCloning.cloneDescription'),
       disabled: !audioBlob
     },
     {
       id: 'speak' as ActiveTab,
-      label: 'Generate Speech',
+      label: t('voiceCloning.generateSpeech'),
       icon: Volume2,
-      description: 'Hear text in your voice',
+      description: t('voiceCloning.speakDescription'),
       disabled: !selectedVoiceId
     },
     {
       id: 'manage' as ActiveTab,
-      label: 'All Voices',
+      label: t('voiceCloning.allVoices'),
       icon: User,
-      description: 'View all available voices',
+      description: t('voiceCloning.manageDescription'),
       disabled: false
     },
     {
       id: 'custom' as ActiveTab,
-      label: 'My Voices',
+      label: t('voiceCloning.myVoices'),
       icon: Settings,
-      description: 'Manage your custom voice clones',
+      description: t('voiceCloning.customDescription'),
       disabled: false
     },
     {
       id: 'history' as ActiveTab,
-      label: 'History',
+      label: t('voiceCloning.history'),
       icon: History,
-      description: 'View your generated audio history',
+      description: t('voiceCloning.historyDescription'),
       disabled: false
     }
   ];
@@ -135,7 +137,7 @@ const VoiceCloningPage = () => {
           <div className="text-center">
             <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 mb-8 transition-colors">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              {t('voiceCloning.backToHome')}
             </Link>
             
             <div className="bg-red-50/80 dark:bg-red-900/30 backdrop-blur-sm border border-red-200 dark:border-red-800 rounded-2xl p-8 shadow-xl">
@@ -143,17 +145,17 @@ const VoiceCloningPage = () => {
                 <Mic className="h-10 w-10 text-red-600 dark:text-red-400" />
               </div>
               <h2 className="text-2xl font-bold text-red-800 dark:text-red-200 mb-3">
-                Service Not Available
+                {t('voiceCloning.serviceNotAvailable')}
               </h2>
               <p className="text-red-700 dark:text-red-300 mb-6 text-lg">
-                The voice cloning service is currently unavailable.
+                {t('voiceCloning.serviceUnavailable')}
               </p>
               <Button 
                 onClick={checkBackendHealth} 
                 variant="outline"
                 className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 border-red-200 dark:border-red-700 hover:from-red-100 hover:to-orange-100"
               >
-                Retry Connection
+                {t('voiceCloning.retryConnection')}
               </Button>
             </div>
           </div>
@@ -178,7 +180,7 @@ const VoiceCloningPage = () => {
             className="inline-flex items-center text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 mb-6 transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
+            {t('voiceCloning.backToHome')}
           </Link>
           
           <div className="text-center mb-8">
@@ -186,7 +188,7 @@ const VoiceCloningPage = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 backdrop-blur-sm">
               <Sparkles className="h-4 w-4 text-orange-500" />
               <span className="text-sm font-medium bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                AI Voice Cloning Studio
+                {t('voiceCloning.aiVoiceCloningStudio')}
               </span>
             </div>
 
@@ -201,14 +203,13 @@ const VoiceCloningPage = () => {
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
-                Voice Cloning
+                {t('voiceCloning.title')}
               </span>
               <br />
-              <span className="text-gray-900 dark:text-white">Studio</span>
+              <span className="text-gray-900 dark:text-white">{t('voiceCloning.studio')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Create a digital clone of your voice and generate natural speech using advanced AI technology. 
-              Perfect for content creation, accessibility, and preserving your unique voice.
+              {t('voiceCloning.subtitle')}
             </p>
           </div>
 
@@ -219,7 +220,7 @@ const VoiceCloningPage = () => {
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
               <span className="text-green-800 dark:text-green-200 font-semibold text-lg">
-                Voice cloned successfully! Ready to generate speech in your voice.
+                {t('voiceCloning.voiceClonedSuccess')}
               </span>
             </div>
           )}
@@ -290,10 +291,10 @@ const VoiceCloningPage = () => {
                       <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500">
                         <User className="h-5 w-5 text-white" />
                       </div>
-                      <span className="font-semibold text-lg">No voice selected</span>
+                      <span className="font-semibold text-lg">{t('voiceCloning.noVoiceSelected')}</span>
                     </div>
                     <p className="text-yellow-700 dark:text-yellow-300 text-sm ml-12">
-                      Please go to "All Voices" to select a voice clone, or create one first.
+                      {t('voiceCloning.selectVoiceFirst')}
                     </p>
                   </div>
                 )}
@@ -334,10 +335,10 @@ const VoiceCloningPage = () => {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20">
                 <TrendingUp className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-medium text-orange-600 dark:text-orange-400">How It Works</span>
+                <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{t('voiceCloning.howItWorks')}</span>
               </div>
               <h3 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
-                How Voice Cloning Works
+                {t('voiceCloning.howItWorks')}
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -348,10 +349,9 @@ const VoiceCloningPage = () => {
                     <Mic className="h-10 w-10 text-white" />
                   </div>
                 </div>
-                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">1. Record Your Voice</h4>
+                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">{t('voiceCloning.howStep1')}</h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Record at least 30 seconds of clear speech or upload an audio file. 
-                  Our AI analyzes your unique vocal characteristics.
+                  {t('voiceCloning.howStep1Desc')}
                 </p>
               </div>
               <div className="text-center p-6 rounded-xl bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20 border border-pink-200/50 dark:border-pink-700/30 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
@@ -361,10 +361,9 @@ const VoiceCloningPage = () => {
                     <Sparkles className="h-10 w-10 text-white" />
                   </div>
                 </div>
-                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">2. AI Processing</h4>
+                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">{t('voiceCloning.howStep2')}</h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Advanced neural networks create a digital fingerprint of your voice, 
-                  capturing tone, pitch, and speaking patterns.
+                  {t('voiceCloning.howStep2Desc')}
                 </p>
               </div>
               <div className="text-center p-6 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-950/20 dark:to-blue-950/20 border border-cyan-200/50 dark:border-cyan-700/30 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
@@ -374,10 +373,9 @@ const VoiceCloningPage = () => {
                     <Volume2 className="h-10 w-10 text-white" />
                   </div>
                 </div>
-                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">3. Generate Speech</h4>
+                <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">{t('voiceCloning.howStep3')}</h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Type any text and hear it spoken in your own voice with natural 
-                  intonation and emotion.
+                  {t('voiceCloning.howStep3Desc')}
                 </p>
               </div>
             </div>

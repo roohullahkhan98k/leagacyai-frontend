@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, UserPlus, Upload } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, UserPlus, Upload, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -12,6 +13,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => {
+  const { t } = useTranslation();
   const { register, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -24,6 +26,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,13 +46,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        setErrors(prev => ({ ...prev, profilePicture: 'Only image files (JPEG, JPG, PNG, GIF, WebP) are allowed' }));
+        setErrors(prev => ({ ...prev, profilePicture: t('auth.onlyImageFiles') }));
         return;
       }
       
       // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, profilePicture: 'File size too large. Maximum size is 5MB.' }));
+        setErrors(prev => ({ ...prev, profilePicture: t('auth.fileSizeTooLarge') }));
         return;
       }
       
@@ -61,37 +65,41 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
     const newErrors: Record<string, string> = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('auth.validEmail');
     }
 
     if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = t('auth.usernameRequired');
     } else if (formData.username.length < 3 || formData.username.length > 30) {
-      newErrors.username = 'Username must be between 3 and 30 characters';
+      newErrors.username = t('auth.usernameLength');
     } else if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
-      newErrors.username = 'Username can only contain letters and numbers';
+      newErrors.username = t('auth.usernameAlphanumeric');
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('auth.passwordMinLength');
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('auth.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('auth.passwordsDoNotMatch');
     }
 
     if (formData.firstName && formData.firstName.length > 50) {
-      newErrors.firstName = 'First name must be less than 50 characters';
+      newErrors.firstName = t('auth.firstNameMaxLength');
     }
 
     if (formData.lastName && formData.lastName.length > 50) {
-      newErrors.lastName = 'Last name must be less than 50 characters';
+      newErrors.lastName = t('auth.lastNameMaxLength');
+    }
+
+    if (!agreedToPolicies) {
+      newErrors.policiesAgreement = t('auth.mustAgreeToPolicies');
     }
 
     setErrors(newErrors);
@@ -121,14 +129,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
   };
 
   return (
-    <Card className={className} variant="elevated">
+    <Card className={`${className} border-2 border-gray-200/50 dark:border-gray-700/50 shadow-2xl hover:shadow-3xl transition-all duration-300`} variant="elevated">
       <CardHeader className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center">
-          <UserPlus className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-300">
+          <UserPlus className="w-8 h-8 text-white" />
         </div>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>
-          Sign up to get started with your account
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          {t('auth.createAccount')}
+        </CardTitle>
+        <CardDescription className="text-base">
+          {t('auth.signUpToGetStarted')}
         </CardDescription>
       </CardHeader>
       
@@ -173,16 +183,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
         
         <div className="text-center mb-4">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Click the + icon to add a profile picture (optional)
+            {t('auth.clickIconToAdd')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email Address"
+            label={t('auth.email')}
             name="email"
             type="email"
-            placeholder="Enter your email"
+            placeholder={t('auth.enterEmail')}
             value={formData.email}
             onChange={handleInputChange}
             error={errors.email}
@@ -192,10 +202,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
           />
 
           <Input
-            label="Username"
+            label={t('auth.username')}
             name="username"
             type="text"
-            placeholder="Choose a username"
+            placeholder={t('auth.chooseUsername')}
             value={formData.username}
             onChange={handleInputChange}
             error={errors.username}
@@ -206,10 +216,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="First Name"
+              label={t('auth.firstName')}
               name="firstName"
               type="text"
-              placeholder="First name"
+              placeholder={t('auth.firstName')}
               value={formData.firstName}
               onChange={handleInputChange}
               error={errors.firstName}
@@ -217,10 +227,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
               autoComplete="given-name"
             />
             <Input
-              label="Last Name"
+              label={t('auth.lastName')}
               name="lastName"
               type="text"
-              placeholder="Last name"
+              placeholder={t('auth.lastName')}
               value={formData.lastName}
               onChange={handleInputChange}
               error={errors.lastName}
@@ -230,10 +240,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
           </div>
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             name="password"
             type={showPassword ? 'text' : 'password'}
-            placeholder="Create a password"
+            placeholder={t('auth.createPassword')}
             value={formData.password}
             onChange={handleInputChange}
             error={errors.password}
@@ -253,10 +263,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
           />
 
           <Input
-            label="Confirm Password"
+            label={t('auth.confirmPassword')}
             name="confirmPassword"
             type={showConfirmPassword ? 'text' : 'password'}
-            placeholder="Confirm your password"
+            placeholder={t('auth.confirmYourPassword')}
             value={formData.confirmPassword}
             onChange={handleInputChange}
             error={errors.confirmPassword}
@@ -275,30 +285,113 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className }) => 
             autoComplete="new-password"
           />
 
+          {/* Policy Agreement Checkbox */}
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="policiesAgreement"
+                checked={agreedToPolicies}
+                onChange={(e) => {
+                  setAgreedToPolicies(e.target.checked);
+                  if (errors.policiesAgreement) {
+                    setErrors(prev => ({ ...prev, policiesAgreement: '' }));
+                  }
+                }}
+                className="mt-0.5 w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 focus:ring-2 cursor-pointer"
+                disabled={isLoading}
+                required
+              />
+              <label 
+                htmlFor="policiesAgreement"
+                className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+              >
+                {t('auth.agreeToPolicies')}{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline font-medium"
+                >
+                  {t('auth.termsAndConditions')}
+                </button>
+              </label>
+            </div>
+            {errors.policiesAgreement && (
+              <p className="text-sm text-red-600 dark:text-red-400 ml-8">
+                {errors.policiesAgreement}
+              </p>
+            )}
+          </div>
 
           <Button
             type="submit"
             className="w-full"
             isLoading={isLoading}
-            disabled={isLoading}
+            disabled={isLoading || !agreedToPolicies}
             leftIcon={<UserPlus className="w-4 h-4" />}
           >
-            {isLoading ? 'Creating account...' : 'Create Account'}
+            {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
           </Button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
+              {t('auth.alreadyHaveAccount')}{' '}
               <Link 
                 to="/login" 
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium transition-colors"
               >
-                Sign in
+                {t('auth.signIn')}
               </Link>
             </p>
           </div>
         </form>
       </CardContent>
+
+      {/* Terms and Conditions Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowTermsModal(false)}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50 max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                {t('auth.termsAndConditions')}
+              </h2>
+              <button
+                onClick={() => setShowTermsModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base">
+                  I confirm that I have read, understood, and agree to all Multiventure Industries policies, including the Privacy Policy, Terms of Service, Data Protection Policy, Security & Compliance Policies, AI Governance Policies, and all documents available in the Legal & Compliance Hub. I consent to the processing, storage, and use of my data in accordance with these policies.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800">
+              <Button
+                onClick={() => setShowTermsModal(false)}
+                className="w-full"
+              >
+                {t('common.close')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

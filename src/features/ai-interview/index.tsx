@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Settings, History, Video, Sparkles, Zap, Mic, BrainCircuit, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/ui/Button';
 import InterviewControls from '../../components/interview/InterviewControls';
 import LiveTranscription, { LiveTranscriptionRef } from '../../components/interview/LiveTranscription';
@@ -16,6 +17,7 @@ import { Interview } from '../../services/interviewApi';
 type ViewMode = 'start' | 'active' | 'history' | 'detail';
 
 const InterviewPage = () => {
+  const { t } = useTranslation();
   const [showSettings, setShowSettings] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [screenShareError, setScreenShareError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ const InterviewPage = () => {
       setViewMode('active');
       setScreenShareError(null);
     } catch (error) {
-      setScreenShareError('Failed to start screen sharing. Please make sure you have granted the necessary permissions.');
+      setScreenShareError(t('interview.screenShareError'));
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +132,7 @@ const InterviewPage = () => {
                 className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-6 transition-colors group"
               >
                 <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                Back to Home
+                {t('interview.backToHome')}
               </Link>
               
               <div className="mb-8">
@@ -144,11 +146,11 @@ const InterviewPage = () => {
                   <div>
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                       <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                        AI Interview Engine
+                        {t('interview.title')}
                       </span>
                     </h1>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                      Real-time Transcription & AI Assistance
+                      {t('interview.subtitle')}
                     </p>
                   </div>
                 </div>
@@ -163,7 +165,7 @@ const InterviewPage = () => {
                     <Zap className="h-6 w-6" />
                   </div>
                   <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    How It Works
+                    {t('interview.howItWorks')}
                   </h2>
                 </div>
                 <div className="space-y-6">
@@ -171,19 +173,19 @@ const InterviewPage = () => {
                     <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg">
                       1
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Join your interview call (Zoom, Teams, or Google Meet)</p>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">{t('interview.step1')}</p>
                   </div>
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-950/20 dark:to-blue-950/20 border border-cyan-200/50 dark:border-blue-700/30 hover:shadow-md transition-all duration-200">
                     <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
                       2
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Click "Start Interview" and share your screen with audio</p>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">{t('interview.step2')}</p>
                   </div>
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 border border-blue-200/50 dark:border-cyan-700/30 hover:shadow-md transition-all duration-200">
                     <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg">
                       3
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">Get real-time transcription and AI-powered answer suggestions</p>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg pt-2">{t('interview.step3')}</p>
                   </div>
                 </div>
               </div>
@@ -197,7 +199,7 @@ const InterviewPage = () => {
                   className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-xl shadow-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                 >
                   <Video className="h-5 w-5 mr-2" />
-                  {isLoading ? 'Starting...' : 'Start Interview'}
+                  {isLoading ? t('interview.starting') : t('interview.startInterview')}
                 </Button>
                 
                 <Button
@@ -207,7 +209,7 @@ const InterviewPage = () => {
                   className="text-lg px-8 py-4 border-2 border-blue-200 dark:border-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-blue-950/20 dark:hover:to-cyan-950/20 transition-all duration-300 w-full sm:w-auto text-blue-600 dark:text-blue-400"
                 >
                   <History className="h-5 w-5 mr-2" />
-                  View History
+                  {t('interview.viewHistory')}
                 </Button>
               </div>
 
@@ -231,7 +233,7 @@ const InterviewPage = () => {
                 className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-6 transition-colors group"
               >
                 <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                Back to Home
+                {t('interview.backToHome')}
               </Link>
               
               <div className="mb-8">
@@ -245,11 +247,11 @@ const InterviewPage = () => {
                   <div>
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                       <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                        Interview History
+                        {t('interview.interviewHistory')}
                       </span>
                     </h1>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                      View and manage your past interviews
+                      {t('interview.viewPastInterviews')}
                     </p>
                   </div>
                 </div>
@@ -273,7 +275,7 @@ const InterviewPage = () => {
                 className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-6 transition-colors group"
               >
                 <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                Back to Home
+                {t('interview.backToHome')}
               </Link>
               
               <div className="mb-8">
@@ -287,11 +289,11 @@ const InterviewPage = () => {
                   <div>
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                       <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                        Interview Details
+                        {t('interview.interviewDetails')}
                       </span>
                     </h1>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                      Full transcript and analysis
+                      {t('interview.fullTranscript')}
                     </p>
                   </div>
                 </div>
@@ -313,7 +315,7 @@ const InterviewPage = () => {
         <>
           {/* Screen Share Panel */}
           <DraggablePanel
-            title="Screen Share"
+            title={t('interview.screenShare')}
             defaultPosition={{ x: PANEL_GAP, y: PANEL_GAP }}
             defaultSize={{ 
               width: window.innerWidth / 3 - PANEL_GAP * 1.5, 
@@ -335,7 +337,7 @@ const InterviewPage = () => {
 
           {/* Live Transcription Panel */}
           <DraggablePanel
-            title="Live Transcription"
+            title={t('interview.liveTranscription')}
             defaultPosition={{
               x: window.innerWidth / 3 + PANEL_GAP / 2,
               y: PANEL_GAP,
@@ -373,7 +375,7 @@ const InterviewPage = () => {
 
           {/* AI Answers Panel */}
           <DraggablePanel
-            title="AI Answers"
+            title={t('interview.aiAnswers')}
             defaultPosition={{ 
               x: window.innerWidth / 3 + PANEL_GAP / 2, 
               y: PANEL_GAP * 2 + (window.innerHeight - PANEL_GAP * 3 - CONTROLS_HEIGHT) / 2 
