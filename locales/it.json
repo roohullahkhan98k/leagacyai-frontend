@@ -67,7 +67,36 @@
     "ofAIPoweredLegacy": "del Patrimonio Alimentato dall'IA",
     "joinThousands": "Unisciti a migliaia di utenti che stanno già trasformando il modo in cui preservano e interagiscono con i loro ricordi.",
     "startFreeTrial": "Inizia Prova Gratuita",
-    "scheduleDemo": "Programma Demo"
+    "viewPricing": "Visualizza Prezzi"
+  },
+  "pricing": {
+    "badge": "Scegli Il Tuo Piano",
+    "title": "Piani di Prezzo",
+    "subtitle": "Seleziona il piano perfetto per le tue esigenze",
+    "loading": "Caricamento piani...",
+    "mostPopular": "Più Popolare",
+    "getStarted": "Inizia",
+    "processing": "Elaborazione...",
+    "faqTitle": "Domande Frequenti",
+    "faq1": {
+      "question": "Posso cambiare piano in seguito?",
+      "answer": "Sì, puoi aggiornare o degradare il tuo piano in qualsiasi momento. Le modifiche saranno riflesse nel tuo prossimo ciclo di fatturazione."
+    },
+    "faq2": {
+      "question": "Quali metodi di pagamento accettate?",
+      "answer": "Accettiamo tutte le principali carte di credito e debito, e PayPal. Tutti i pagamenti vengono elaborati in modo sicuro."
+    },
+    "faq3": {
+      "question": "C'è una prova gratuita?",
+      "answer": "Sì, tutti i piani includono una prova gratuita di 14 giorni. Non è richiesta una carta di credito per iniziare la tua prova."
+    },
+    "faq4": {
+      "question": "Posso cancellare in qualsiasi momento?",
+      "answer": "Assolutamente! Puoi cancellare il tuo abbonamento in qualsiasi momento. Il tuo accesso continuerà fino alla fine del tuo periodo di fatturazione."
+    },
+    "ctaTitle": "Pronto a Iniziare?",
+    "ctaDescription": "Unisciti a migliaia di utenti che stanno già utilizzando la nostra piattaforma per migliorare il loro flusso di lavoro.",
+    "backToHome": "Torna alla Home"
   },
   "auth": {
     "email": "E-mail",

@@ -67,7 +67,36 @@
     "ofAIPoweredLegacy": "des KI-gestützten Vermächtnisses",
     "joinThousands": "Schließen Sie sich Tausenden von Benutzern an, die bereits transformieren, wie sie ihre Erinnerungen bewahren und damit interagieren.",
     "startFreeTrial": "Kostenlose Testversion starten",
-    "scheduleDemo": "Demo planen"
+    "viewPricing": "Preise anzeigen"
+  },
+  "pricing": {
+    "badge": "Wählen Sie Ihren Plan",
+    "title": "Preispläne",
+    "subtitle": "Wählen Sie den perfekten Plan für Ihre Bedürfnisse",
+    "loading": "Pläne werden geladen...",
+    "mostPopular": "Am beliebtesten",
+    "getStarted": "Loslegen",
+    "processing": "Wird verarbeitet...",
+    "faqTitle": "Häufig gestellte Fragen",
+    "faq1": {
+      "question": "Kann ich den Plan später ändern?",
+      "answer": "Ja, Sie können Ihren Plan jederzeit upgraden oder downgraden. Änderungen werden in Ihrem nächsten Abrechnungszyklus wirksam."
+    },
+    "faq2": {
+      "question": "Welche Zahlungsmethoden akzeptieren Sie?",
+      "answer": "Wir akzeptieren alle gängigen Kreditkarten, Debitkarten und PayPal. Alle Zahlungen werden sicher verarbeitet."
+    },
+    "faq3": {
+      "question": "Gibt es eine kostenlose Testversion?",
+      "answer": "Ja, alle Pläne kommen mit einer 14-tägigen kostenlosen Testversion. Keine Kreditkarte erforderlich, um Ihre Testversion zu starten."
+    },
+    "faq4": {
+      "question": "Kann ich jederzeit kündigen?",
+      "answer": "Absolut! Sie können Ihr Abonnement jederzeit kündigen. Ihr Zugang bleibt bis zum Ende Ihres Abrechnungszeitraums bestehen."
+    },
+    "ctaTitle": "Bereit loszulegen?",
+    "ctaDescription": "Schließen Sie sich Tausenden von Benutzern an, die bereits unsere Plattform nutzen, um ihren Workflow zu verbessern.",
+    "backToHome": "Zurück zur Startseite"
   },
   "auth": {
     "email": "E-Mail",

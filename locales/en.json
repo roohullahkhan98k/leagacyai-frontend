@@ -68,7 +68,36 @@
     "ofAIPoweredLegacy": "of AI-Powered Legacy",
     "joinThousands": "Join thousands of users who are already transforming how they preserve and interact with their memories.",
     "startFreeTrial": "Start Free Trial",
-    "scheduleDemo": "Schedule Demo"
+    "viewPricing": "View Pricing"
+  },
+  "pricing": {
+    "badge": "Choose Your Plan",
+    "title": "Pricing Plans",
+    "subtitle": "Select the perfect plan for your needs",
+    "loading": "Loading plans...",
+    "mostPopular": "Most Popular",
+    "getStarted": "Get Started",
+    "processing": "Processing...",
+    "faqTitle": "Frequently Asked Questions",
+    "faq1": {
+      "question": "Can I change plans later?",
+      "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle."
+    },
+    "faq2": {
+      "question": "What payment methods do you accept?",
+      "answer": "We accept all major credit cards, debit cards, and PayPal. All payments are processed securely."
+    },
+    "faq3": {
+      "question": "Is there a free trial?",
+      "answer": "Yes, all plans come with a 14-day free trial. No credit card required to start your trial."
+    },
+    "faq4": {
+      "question": "Can I cancel anytime?",
+      "answer": "Absolutely! You can cancel your subscription at any time. Your access will continue until the end of your billing period."
+    },
+    "ctaTitle": "Ready to Get Started?",
+    "ctaDescription": "Join thousands of users who are already using our platform to enhance their workflow.",
+    "backToHome": "Back to Home"
   },
   "auth": {
     "email": "Email",

@@ -67,7 +67,36 @@
     "ofAIPoweredLegacy": "AI驱动的遗产",
     "joinThousands": "加入数千名已经在改变他们保存和与记忆互动方式的用户。",
     "startFreeTrial": "开始免费试用",
-    "scheduleDemo": "安排演示"
+    "viewPricing": "查看价格"
+  },
+  "pricing": {
+    "badge": "选择您的计划",
+    "title": "价格计划",
+    "subtitle": "选择适合您需求的完美计划",
+    "loading": "加载计划中...",
+    "mostPopular": "最受欢迎",
+    "getStarted": "开始",
+    "processing": "处理中...",
+    "faqTitle": "常见问题",
+    "faq1": {
+      "question": "我以后可以更改计划吗？",
+      "answer": "是的，您可以随时升级或降级您的计划。更改将在您的下一个计费周期中生效。"
+    },
+    "faq2": {
+      "question": "您接受哪些付款方式？",
+      "answer": "我们接受所有主要的信用卡和借记卡，以及PayPal。所有付款都经过安全处理。"
+    },
+    "faq3": {
+      "question": "有免费试用吗？",
+      "answer": "是的，所有计划都包含14天免费试用。开始试用不需要信用卡。"
+    },
+    "faq4": {
+      "question": "我可以随时取消吗？",
+      "answer": "当然可以！您可以随时取消订阅。您的访问权限将持续到您的计费期结束。"
+    },
+    "ctaTitle": "准备开始了吗？",
+    "ctaDescription": "加入数千名已经在使用我们的平台来改善工作流程的用户。",
+    "backToHome": "返回首页"
   },
   "auth": {
     "email": "电子邮件",

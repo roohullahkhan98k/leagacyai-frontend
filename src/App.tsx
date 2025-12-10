@@ -7,6 +7,9 @@ import Header from './components/layout/Header';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import PricingPage from './pages/PricingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentCancelPage from './pages/PaymentCancelPage';
 import InterviewPage from './features/ai-interview';
 import MemoryGraphPage from './features/memory-graph';
 import VoiceCloningPage from './features/voice-cloning';
@@ -41,8 +44,17 @@ function AppContent() {
   const location = useLocation();
   const { i18n } = useTranslation();
 
-  // Hide header on login and register pages
-  const shouldShowHeader = !isInterviewActive && location.pathname !== '/login' && location.pathname !== '/register';
+  // Hide header on login, register, and payment pages
+  const shouldShowHeader = !isInterviewActive && 
+    location.pathname !== '/login' && 
+    location.pathname !== '/register' &&
+    location.pathname !== '/subscription/success' &&
+    location.pathname !== '/subscription/cancel';
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Always keep UI in LTR - only content text can be RTL
   useEffect(() => {
@@ -61,6 +73,9 @@ function AppContent() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/subscription/success" element={<PaymentSuccessPage />} />
+            <Route path="/subscription/cancel" element={<PaymentCancelPage />} />
             
             {/* Protected routes */}
             <Route 

@@ -67,7 +67,36 @@
     "ofAIPoweredLegacy": "du Patrimoine Alimenté par l'IA",
     "joinThousands": "Rejoignez des milliers d'utilisateurs qui transforment déjà la façon dont ils préservent et interagissent avec leurs souvenirs.",
     "startFreeTrial": "Démarrer l'Essai Gratuit",
-    "scheduleDemo": "Planifier une Démo"
+    "viewPricing": "Voir les Tarifs"
+  },
+  "pricing": {
+    "badge": "Choisissez Votre Plan",
+    "title": "Plans Tarifaires",
+    "subtitle": "Sélectionnez le plan parfait pour vos besoins",
+    "loading": "Chargement des plans...",
+    "mostPopular": "Le Plus Populaire",
+    "getStarted": "Commencer",
+    "processing": "Traitement en cours...",
+    "faqTitle": "Questions Fréquemment Posées",
+    "faq1": {
+      "question": "Puis-je changer de plan plus tard?",
+      "answer": "Oui, vous pouvez mettre à niveau ou rétrograder votre plan à tout moment. Les modifications seront reflétées dans votre prochain cycle de facturation."
+    },
+    "faq2": {
+      "question": "Quels modes de paiement acceptez-vous?",
+      "answer": "Nous acceptons toutes les principales cartes de crédit et de débit, et PayPal. Tous les paiements sont traités en toute sécurité."
+    },
+    "faq3": {
+      "question": "Y a-t-il un essai gratuit?",
+      "answer": "Oui, tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit n'est requise pour commencer votre essai."
+    },
+    "faq4": {
+      "question": "Puis-je annuler à tout moment?",
+      "answer": "Absolument! Vous pouvez annuler votre abonnement à tout moment. Votre accès continuera jusqu'à la fin de votre période de facturation."
+    },
+    "ctaTitle": "Prêt à Commencer?",
+    "ctaDescription": "Rejoignez des milliers d'utilisateurs qui utilisent déjà notre plateforme pour améliorer leur flux de travail.",
+    "backToHome": "Retour à l'Accueil"
   },
   "auth": {
     "email": "E-mail",

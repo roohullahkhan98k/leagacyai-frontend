@@ -67,7 +67,36 @@
     "ofAIPoweredLegacy": "do Legado Alimentado por IA",
     "joinThousands": "Junte-se a milhares de usuários que já estão transformando como preservam e interagem com suas memórias.",
     "startFreeTrial": "Iniciar Teste Gratuito",
-    "scheduleDemo": "Agendar Demonstração"
+    "viewPricing": "Ver Preços"
+  },
+  "pricing": {
+    "badge": "Escolha Seu Plano",
+    "title": "Planos de Preços",
+    "subtitle": "Selecione o plano perfeito para suas necessidades",
+    "loading": "Carregando planos...",
+    "mostPopular": "Mais Popular",
+    "getStarted": "Começar",
+    "processing": "Processando...",
+    "faqTitle": "Perguntas Frequentes",
+    "faq1": {
+      "question": "Posso mudar de plano depois?",
+      "answer": "Sim, você pode atualizar ou fazer downgrade do seu plano a qualquer momento. As alterações serão refletidas no seu próximo ciclo de cobrança."
+    },
+    "faq2": {
+      "question": "Quais métodos de pagamento vocês aceitam?",
+      "answer": "Aceitamos todos os principais cartões de crédito e débito, e PayPal. Todos os pagamentos são processados com segurança."
+    },
+    "faq3": {
+      "question": "Há um teste gratuito?",
+      "answer": "Sim, todos os planos vêm com um teste gratuito de 14 dias. Não é necessário cartão de crédito para iniciar seu teste."
+    },
+    "faq4": {
+      "question": "Posso cancelar a qualquer momento?",
+      "answer": "Absolutamente! Você pode cancelar sua assinatura a qualquer momento. Seu acesso continuará até o final do seu período de cobrança."
+    },
+    "ctaTitle": "Pronto para Começar?",
+    "ctaDescription": "Junte-se a milhares de usuários que já estão usando nossa plataforma para melhorar seu fluxo de trabalho.",
+    "backToHome": "Voltar para o Início"
   },
   "auth": {
     "email": "E-mail",

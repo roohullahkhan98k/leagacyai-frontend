@@ -66,6 +66,8 @@ const Header = () => {
                   src="/legacy-logo.png" 
                   alt="Legacy AI" 
                   className="relative h-12 md:h-16 w-auto"
+                  style={{ maxHeight: '64px', width: 'auto', height: 'auto' }}
+                  loading="eager"
                 />
               </div>
             </Link>
@@ -160,6 +162,8 @@ const Header = () => {
                 src="/legacy-logo.png" 
                 alt="Legacy AI" 
                 className="h-10 w-auto"
+                style={{ maxHeight: '40px', width: 'auto', height: 'auto' }}
+                loading="eager"
               />
             </div>
             <button

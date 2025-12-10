@@ -1,7 +1,7 @@
-const CACHE_NAME = 'legacy-ai-v1';
+const CACHE_NAME = 'legacy-ai-v3';
 
-const STATIC_CACHE = 'legacy-ai-static-v1';
-const API_CACHE = 'legacy-ai-api-v1';
+const STATIC_CACHE = 'legacy-ai-static-v3';
+const API_CACHE = 'legacy-ai-api-v3';
 
 const staticUrlsToCache = [
   '/',
@@ -48,9 +48,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages - Cache-First with offline fallback
+  // HTML pages - Network-First (always get fresh HTML, cache only for offline)
   if (request.destination === 'document') {
-    event.respondWith(cacheFirstWithOfflineFallback(request));
+    event.respondWith(networkFirstForHTML(request));
     return;
   }
 
@@ -58,8 +58,28 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(cacheFirst(request));
 });
 
-// Stale-While-Revalidate for static assets
+// Stale-While-Revalidate for static assets (but always check network for CSS/JS in dev)
 async function staleWhileRevalidate(request) {
+  const url = new URL(request.url);
+  const isDev = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  
+  // In development, always fetch fresh CSS/JS to avoid stale cache issues
+  if (isDev && (url.pathname.endsWith('.css') || url.pathname.endsWith('.js'))) {
+    try {
+      const networkResponse = await fetch(request);
+      if (networkResponse.status === 200) {
+        const cache = await caches.open(STATIC_CACHE);
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (error) {
+      // Fallback to cache if network fails
+      const cache = await caches.open(STATIC_CACHE);
+      return cache.match(request) || new Response('Resource not available', { status: 503 });
+    }
+  }
+  
+  // Production: use stale-while-revalidate
   const cache = await caches.open(STATIC_CACHE);
   const cachedResponse = await cache.match(request);
   
@@ -92,22 +112,25 @@ async function networkFirst(request) {
   }
 }
 
-// Cache-First with offline fallback for HTML
-async function cacheFirstWithOfflineFallback(request) {
-  const cache = await caches.open(STATIC_CACHE);
-  const cachedResponse = await cache.match(request);
-  
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-
+// Network-First for HTML (always try network first, fallback to cache only if offline)
+async function networkFirstForHTML(request) {
   try {
+    // Always try network first for HTML to get fresh content
     const networkResponse = await fetch(request);
     if (networkResponse.status === 200) {
+      // Only cache if we got a successful response
+      const cache = await caches.open(STATIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
   } catch (error) {
+    // Only use cache if network fails (offline scenario)
+    const cache = await caches.open(STATIC_CACHE);
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    // Ultimate fallback to offline page
     return cache.match('/offline.html') || new Response('Offline', { status: 503 });
   }
 }

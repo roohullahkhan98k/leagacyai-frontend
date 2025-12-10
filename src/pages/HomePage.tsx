@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card, { CardContent } from '../components/ui/Card';
@@ -142,6 +142,15 @@ const HomePage = () => {
               {t('home.getStarted')}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
+            <Link to="/pricing">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+              >
+                <CreditCard className="h-5 w-5 mr-2" />
+                View Pricing
+              </Button>
+            </Link>
             <Button 
               size="lg" 
               variant="outline"
@@ -342,25 +351,24 @@ const HomePage = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="text-lg px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
-              onClick={() => {
-                document.getElementById('features-section')?.scrollIntoView({ 
-                  behavior: 'smooth' 
-                });
-              }}
-            >
-              {t('home.startFreeTrial')}
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="text-lg px-10 py-4 border-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300"
-            >
-              {t('home.scheduleDemo')}
-            </Button>
+            <Link to="/pricing">
+              <Button 
+                size="lg" 
+                className="text-lg px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
+              >
+                {t('home.startFreeTrial')}
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/pricing">
+              <Button 
+                size="lg" 
+                className="text-lg px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+              >
+                <CreditCard className="h-5 w-5 mr-2" />
+                {t('home.viewPricing')}
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
