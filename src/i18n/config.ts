@@ -41,21 +41,24 @@ const resources = {
   zh: { translation: zhTranslations },
 };
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'ar', 'hi', 'es', 'fr', 'de', 'pt', 'it', 'ru', 'ja', 'ko', 'zh'],
-    interpolation: {
-      escapeValue: false,
-    },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
-  });
+// Ensure i18n is initialized synchronously before any components use it
+if (!i18n.isInitialized) {
+  i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: 'en',
+      supportedLngs: ['en', 'ar', 'hi', 'es', 'fr', 'de', 'pt', 'it', 'ru', 'ja', 'ko', 'zh'],
+      interpolation: {
+        escapeValue: false,
+      },
+      detection: {
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
+      },
+    });
+}
 
 export default i18n;
 

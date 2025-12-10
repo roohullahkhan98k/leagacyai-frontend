@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Network, RefreshCw, Search, Upload, Plus, X, Maximize2, User, Calendar, Tag, Image as ImageIcon, FileText, Globe } from 'lucide-react';
+import { ArrowLeft, Network, RefreshCw, Search, Upload, Plus, X, Maximize2, User, Calendar, Tag, Image as ImageIcon, FileText, Globe, Languages, ChevronDown } from 'lucide-react';
 import PageContainer from '../../components/layout/PageContainer';
 import Button from '../../components/ui/Button';
 import { cn } from '../../utils/cn';
 import type { GraphResponse, GraphNode, LanguageInfo } from '../../services/memoryGraphApi';
-import { createMemory, deleteMemory, getGraph, searchMemories, uploadMedia, updateMemory } from '../../services/memoryGraphApi';
+import { createMemory, deleteMemory, getGraph, searchMemories, uploadMedia, updateMemory, getTranslatedMemory } from '../../services/memoryGraphApi';
 import DraggablePanel from '../../components/ui/DraggablePanel';
 import FloatingPanel from '../../components/ui/FloatingPanel';
 import VideoPlayer from '../../components/ui/VideoPlayer';
@@ -14,13 +14,18 @@ import ProfessionalMemoryGraph from '../../components/multimedia/ProfessionalMem
 import { toast } from 'react-toastify';
 
 const MemoryGraphPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [graph, setGraph] = useState<GraphResponse | null>(null);
   const [loadingGraph, setLoadingGraph] = useState(false);
   const [query, setQuery] = useState('');
   const [personFilter, setPersonFilter] = useState('');
   const [searchResults, setSearchResults] = useState<{ id?: string; doc: string; meta: Record<string, unknown> }[]>([]);
+  const [queryLanguage, setQueryLanguage] = useState<LanguageInfo | null>(null);
   const [searching, setSearching] = useState(false);
+  const [translatedMemories, setTranslatedMemories] = useState<Record<string, { document: string; original_document?: string; original_language?: string; display_language?: string; available_languages?: string[]; has_translations?: boolean }>>({});
+  const [loadingTranslation, setLoadingTranslation] = useState<Set<string>>(new Set());
+  const [viewingOriginal, setViewingOriginal] = useState<Set<string>>(new Set());
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState<Record<string, boolean>>({});
   const [creating, setCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,6 +67,53 @@ const MemoryGraphPage = () => {
     loadAvailableMemories();
   }, []);
 
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.language-dropdown-container')) {
+        setLanguageDropdownOpen({});
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Auto-load translation when memory modal opens and translation is available
+  useEffect(() => {
+    if (viewMemoryModal.open && viewMemoryModal.node) {
+      const node = viewMemoryModal.node;
+      const meta: any = node.data || {};
+      const language: LanguageInfo | undefined = meta.language 
+        ? (typeof meta.language === 'string' 
+            ? { code: meta.language, name: meta.language, isRTL: false }
+            : meta.language)
+        : undefined;
+      const hasTranslations = meta.hasTranslations || meta.translated_texts;
+      const translatedData = translatedMemories[node.id];
+      const userLang = i18n.language || 'en';
+      const isTranslating = loadingTranslation.has(node.id);
+      const availableLanguages = meta.availableLanguages || translatedData?.available_languages;
+
+      // Only auto-load if:
+      // 1. Translations actually exist (not just hasTranslations flag)
+      // 2. User language is different from original
+      // 3. Translation not already loaded
+      // 4. Not currently loading
+      // 5. User's language is available in translations
+      const shouldAutoLoad = hasTranslations && 
+        language && 
+        language.code !== userLang && 
+        !translatedData && 
+        !isTranslating &&
+        availableLanguages?.includes(userLang);
+
+      if (shouldAutoLoad) {
+        loadTranslatedMemory(node.id, userLang);
+      }
+    }
+  }, [viewMemoryModal.open, viewMemoryModal.node?.id, i18n.language, translatedMemories, loadingTranslation]);
+
   async function loadAvailableMemories() {
     try {
       const g = await getGraph('memory', 200);
@@ -84,6 +136,10 @@ const MemoryGraphPage = () => {
       } else {
         // Only refresh the memory list; do not render full graph until a memory is selected
         await loadAvailableMemories();
+      }
+      // Re-run the last search if it exists to refresh search results
+      if (lastSearch) {
+        await onSearch(true); // Use lastSearch parameters
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -114,14 +170,20 @@ const MemoryGraphPage = () => {
     return { nodes, edges, count: nodes.length };
   }
 
-  async function onSearch() {
+  async function onSearch(useLastSearch = false) {
     try {
       setSearching(true);
-      const res = await searchMemories({ q: query, n: 10, person: personFilter || undefined });
+      // Use lastSearch parameters if requested, otherwise use current state
+      const searchParams = useLastSearch && lastSearch 
+        ? { q: lastSearch.q, n: lastSearch.n || 10, person: lastSearch.person, event: lastSearch.event, tag: lastSearch.tag }
+        : { q: query, n: 10, person: personFilter || undefined };
+      
+      const res = await searchMemories(searchParams);
       const ids = res.ids?.[0] || [];
       const docs = (res.documents?.[0] || []).map((doc, idx) => ({ id: ids[idx], doc, meta: (res.metadatas?.[0] || [])[idx] || {} }));
       setSearchResults(docs);
-      setLastSearch({ q: query, n: 10, person: personFilter || undefined });
+      setQueryLanguage(res.queryLanguage || null);
+      setLastSearch({ q: searchParams.q, n: searchParams.n, person: searchParams.person, event: searchParams.event, tag: searchParams.tag });
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -169,6 +231,39 @@ const MemoryGraphPage = () => {
       console.error(e);
     } finally {
       setLoadingGraph(false);
+    }
+  }
+
+  async function loadTranslatedMemory(memoryId: string, lang: string) {
+    if (loadingTranslation.has(memoryId)) return; // Already loading
+    
+    try {
+      setLoadingTranslation(prev => new Set(prev).add(memoryId));
+      const translated = await getTranslatedMemory(memoryId, lang);
+      setTranslatedMemories(prev => ({
+        ...prev,
+        [memoryId]: {
+          document: translated.document,
+          original_document: translated.original_document,
+          original_language: translated.original_language,
+          display_language: translated.display_language,
+          available_languages: translated.available_languages,
+          has_translations: translated.has_translations,
+        }
+      }));
+    } catch (e: any) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load translation:', e);
+      toast.error(e.message || 'Failed to load translation', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    } finally {
+      setLoadingTranslation(prev => {
+        const next = new Set(prev);
+        next.delete(memoryId);
+        return next;
+      });
     }
   }
 
@@ -257,8 +352,11 @@ const MemoryGraphPage = () => {
         autoClose: 3000,
       });
       setIsEditOpen(false);
-      if (lastSearch) await onSearch();
-      await loadGraph();
+      await loadAvailableMemories();
+      // Re-run the last search if it exists to show updated results
+      if (lastSearch) {
+        await onSearch(true); // Use lastSearch parameters
+      }
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error('saveEdit:error', e);
@@ -281,8 +379,11 @@ const MemoryGraphPage = () => {
         autoClose: 3000,
       });
       setIsDeleteOpen(false);
-      if (lastSearch) await onSearch();
-      await loadGraph();
+      await loadAvailableMemories();
+      // Re-run the last search if it exists to show updated results
+      if (lastSearch) {
+        await onSearch(true); // Use lastSearch parameters
+      }
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -339,7 +440,7 @@ const MemoryGraphPage = () => {
                 </select>
                 <Button size="sm" onClick={() => { setIsFloating(v => !v); }} className="w-full sm:w-auto bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200/50 dark:border-blue-700/30 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-300 hover:scale-105">
                   <Maximize2 className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">{isFloating ? 'Dock' : 'Pop out'}</span>
+                  <span className="hidden sm:inline">{isFloating ? t('memory.dock') : t('memory.popOut')}</span>
                 </Button>
               </div>
               <div className="relative">
@@ -386,7 +487,7 @@ const MemoryGraphPage = () => {
                   onChange={e => setPersonFilter(e.target.value)}
                 />
                 <div className="flex justify-end">
-                  <Button size="sm" onClick={onSearch} disabled={searching} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
+                  <Button size="sm" onClick={() => onSearch()} disabled={searching} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
                     <Search className={cn('h-4 w-4 mr-2', searching && 'animate-spin')} />
                     {searching ? t('common.loading') : t('common.search')}
                   </Button>
@@ -394,7 +495,15 @@ const MemoryGraphPage = () => {
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-              <h3 className="font-semibold mb-3 text-sm sm:text-base">{t('memory.results')}</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-sm sm:text-base">{t('memory.results')}</h3>
+                {queryLanguage && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                    <Globe className="h-3 w-3" />
+                    {t('memory.searchingIn', { language: queryLanguage.name })}
+                  </span>
+                )}
+              </div>
               <div className="space-y-3 overflow-y-auto max-h-[300px] sm:max-h-[400px] p-1">
                 {searchResults.length === 0 ? (
                   <p className="text-sm text-gray-500">{t('memory.noResults')}</p>
@@ -412,6 +521,7 @@ const MemoryGraphPage = () => {
                   return (
                     <div key={i} className="p-3 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 select-none">
                       <p 
+                        dir={language?.isRTL ? 'rtl' : 'ltr'}
                         className={cn(
                           "text-sm font-medium mb-2 leading-snug cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors break-words",
                           language?.isRTL && 'rtl-content'
@@ -446,7 +556,7 @@ const MemoryGraphPage = () => {
                           <span>{meta.event ?? '-'}</span>
                         </div>
                         {language && (
-                          <div className="col-span-2 flex items-center gap-1">
+                          <div className="col-span-2 flex items-center gap-1 flex-wrap">
                             <Globe className="h-3 w-3 text-blue-500" />
                             <span className="font-medium text-gray-700 dark:text-gray-300">{t('memory.languageLabel')}: </span>
                             <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
@@ -456,6 +566,26 @@ const MemoryGraphPage = () => {
                               <span className="px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[10px]">
                                 {t('memory.rtl')}
                               </span>
+                            )}
+                            {meta.availableLanguages && meta.availableLanguages.length > 1 && (
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  const currentLang = meta.language || 'en';
+                                  const langIndex = meta.availableLanguages.indexOf(currentLang);
+                                  const nextIndex = (langIndex + 1) % meta.availableLanguages.length;
+                                  const nextLang = meta.availableLanguages[nextIndex];
+                                  
+                                  if (nextLang !== currentLang && r.id) {
+                                    await loadTranslatedMemory(r.id, nextLang);
+                                  }
+                                }}
+                                className="px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-[10px] flex items-center gap-1 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer"
+                                title={`${t('memory.availableLanguages')}: ${meta.availableLanguages.join(', ')}`}
+                              >
+                                <Languages className="h-3 w-3" />
+                                {t('memory.availableLanguages')} ({meta.availableLanguages.length})
+                              </button>
                             )}
                           </div>
                         )}
@@ -535,9 +665,9 @@ const MemoryGraphPage = () => {
               onChange={e => setNewMemory(v => ({ ...v, tags: e.target.value }))}
             />
             <div>
-              <label className="text-sm font-medium mb-1 block">Media</label>
+              <label className="text-sm font-medium mb-1 block">{t('memory.mediaLabel')}</label>
               <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800">
-                <Upload className="h-5 w-5 mr-2 text-gray-500" /> Select files
+                <Upload className="h-5 w-5 mr-2 text-gray-500" /> {t('memory.selectFiles')}
                 <input type="file" className="hidden" multiple accept="image/*,video/*,audio/*" onChange={e => {
                   const next = Array.from(e.target.files || []);
                   if (!next.length) return;
@@ -587,7 +717,7 @@ const MemoryGraphPage = () => {
                 const items = activeMemory.media.split(',').map(s => s.trim()).filter(Boolean);
                 return items.length ? (
                   <div className="mt-2">
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Current media</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('memory.currentMedia')}</div>
                     <div className="grid grid-cols-3 gap-2">
                       {items.map((m, idx) => (
                         <div key={idx} className="relative border rounded p-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -605,7 +735,7 @@ const MemoryGraphPage = () => {
                               setActiveMemory(v => ({ ...v, media: next }));
                             }}
                             className="absolute -top-2 -right-2 bg-gray-200 dark:bg-gray-700 rounded-full h-5 w-5 text-xs"
-                            aria-label="Remove media"
+                            aria-label={t('memory.removeMedia')}
                           >
                             ×
                           </button>
@@ -617,9 +747,9 @@ const MemoryGraphPage = () => {
               })()}
               {/* Attach new media */}
               <div>
-                <label className="text-sm font-medium mb-1 block">Attach new media (device)</label>
+                <label className="text-sm font-medium mb-1 block">{t('memory.attachNewMedia')}</label>
                 <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <Upload className="h-5 w-5 mr-2 text-gray-500" /> Select files
+                  <Upload className="h-5 w-5 mr-2 text-gray-500" /> {t('memory.selectFiles')}
                   <input type="file" className="hidden" multiple accept="image/*,video/*,audio/*" onChange={e => {
                     const next = Array.from(e.target.files || []);
                     if (!next.length) return;
@@ -689,7 +819,7 @@ const MemoryGraphPage = () => {
       </div>
       )}
       {isFloating && (
-        <DraggablePanel title="Memory Graph" defaultSize={{ width: 900, height: 600 }} minWidth={600} minHeight={400} onClose={() => setIsFloating(false)}>
+        <DraggablePanel title={t('memory.title')} defaultSize={{ width: 900, height: 600 }} minWidth={600} minHeight={400} onClose={() => setIsFloating(false)}>
           <div className="h-full w-full rounded-lg bg-slate-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden">
             <ProfessionalMemoryGraph graphData={graph} onNodeClick={(id, node) => focusNodeById(id, node)} />
           </div>
@@ -700,7 +830,20 @@ const MemoryGraphPage = () => {
       {viewMemoryModal.open && viewMemoryModal.node && (() => {
         const node = viewMemoryModal.node;
         const meta: any = node.data || {};
-        const document = meta.document || node.label || '';
+        const originalDocument = meta.document || node.label || '';
+        const translatedData = translatedMemories[node.id];
+        const isViewingOriginal = viewingOriginal.has(node.id);
+        const userLang = i18n.language || 'en';
+        
+        // Check if translation actually changed the text (not a failed translation)
+        const isTranslationValid = translatedData && 
+          translatedData.document !== translatedData.original_document &&
+          translatedData.has_translations;
+        
+        const document = isTranslationValid && !isViewingOriginal 
+          ? translatedData.document 
+          : originalDocument;
+        
         const person = meta.person || '';
         const event = meta.event || '';
         const tags = parseArrayFromUnknown(meta.tags);
@@ -710,6 +853,11 @@ const MemoryGraphPage = () => {
               ? { code: meta.language, name: meta.language, isRTL: false }
               : meta.language)
           : undefined;
+        const hasTranslations = meta.hasTranslations || meta.translated_texts;
+        const availableLanguages = meta.availableLanguages || translatedData?.available_languages || [];
+        const isTranslating = loadingTranslation.has(node.id);
+        const displayLanguage = (isTranslationValid && !isViewingOriginal) ? (translatedData?.display_language || language?.code) : language?.code;
+        const originalLanguage = translatedData?.original_language || language?.code;
         const isImagePath = (u: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(u);
         const isVideoPath = (u: string) => /\.(mp4|webm|ogg|mov|avi)$/i.test(u);
 
@@ -753,12 +901,79 @@ const MemoryGraphPage = () => {
                 {/* Document Text */}
                 {document && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2 mb-3">
-                      <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{t('memory.document')}</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{t('memory.document')}</h3>
+                        {isTranslationValid && !isViewingOriginal && originalLanguage && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            ({t('memory.translatedFrom', { language: originalLanguage })})
+                          </span>
+                        )}
+                        {displayLanguage && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {t('memory.viewingLanguage', { language: displayLanguage.toUpperCase() })}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isTranslating && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <RefreshCw className="h-3 w-3 animate-spin" />
+                            {t('memory.translating')}
+                          </span>
+                        )}
+                        {/* Only show translate button if translations actually exist */}
+                        {hasTranslations && translatedData?.has_translations && !isTranslating && (
+                          <>
+                            {isTranslationValid && !isViewingOriginal ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setViewingOriginal(prev => {
+                                    const next = new Set(prev);
+                                    next.add(node.id);
+                                    return next;
+                                  });
+                                }}
+                                className="text-xs"
+                              >
+                                {t('memory.viewOriginal')}
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  setViewingOriginal(prev => {
+                                    const next = new Set(prev);
+                                    next.delete(node.id);
+                                    return next;
+                                  });
+                                  if (!translatedData) {
+                                    await loadTranslatedMemory(node.id, userLang);
+                                  }
+                                }}
+                                className="text-xs flex items-center gap-1"
+                              >
+                                <Languages className="h-3 w-3" />
+                                {t('memory.translateTo', { language: userLang.toUpperCase() })}
+                              </Button>
+                            )}
+                          </>
+                        )}
+                        {/* Show message when translations not available due to quota */}
+                        {!hasTranslations && language && language.code !== userLang && (
+                          <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">
+                            ⚠️ {t('memory.translationNotAvailable')} ({t('memory.quotaExceeded')})
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <p 
-                      className={`text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap ${language?.isRTL ? 'rtl-content' : ''}`}
+                      dir={(translatedData && !isViewingOriginal ? displayLanguage : language?.code) === 'ar' ? 'rtl' : 'ltr'}
+                      className={`text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap ${(translatedData && !isViewingOriginal ? displayLanguage : language?.code) === 'ar' ? 'rtl-content' : ''}`}
                     >
                       {document}
                     </p>
@@ -798,9 +1013,9 @@ const MemoryGraphPage = () => {
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-indigo-800 dark:text-indigo-200 font-medium">
-                          {language.name || language.code}
+                          {displayLanguage || language.name || language.code}
                         </span>
-                        {language.isRTL && (
+                        {displayLanguage === 'ar' && (
                           <span className="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">
                             {t('memory.rtl')}
                           </span>
@@ -809,6 +1024,52 @@ const MemoryGraphPage = () => {
                           <span className="text-xs text-indigo-600 dark:text-indigo-400">
                             ({Math.round(language.confidence * 100)}% {t('memory.confidence')})
                           </span>
+                        )}
+                        {availableLanguages && availableLanguages.length > 1 && (
+                          <div className="relative language-dropdown-container">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLanguageDropdownOpen(prev => ({
+                                  ...prev,
+                                  [node.id]: !prev[node.id]
+                                }));
+                              }}
+                              className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium flex items-center gap-1 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer"
+                            >
+                              <Languages className="h-3 w-3" />
+                              {t('memory.availableLanguages')} ({availableLanguages.length})
+                              <ChevronDown className={cn("h-2 w-2 transition-transform", languageDropdownOpen[node.id] && "rotate-180")} />
+                            </button>
+                            {languageDropdownOpen[node.id] && (
+                              <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 min-w-[120px]">
+                                {availableLanguages.map((lang: string) => (
+                                  <button
+                                    key={lang}
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      setLanguageDropdownOpen(prev => ({ ...prev, [node.id]: false }));
+                                      if (lang !== language?.code) {
+                                        await loadTranslatedMemory(node.id, lang);
+                                        setViewingOriginal(prev => {
+                                          const next = new Set(prev);
+                                          next.delete(node.id);
+                                          return next;
+                                        });
+                                      }
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                  >
+                                    <Globe className="h-3 w-3" />
+                                    {lang.toUpperCase()}
+                                    {lang === displayLanguage && (
+                                      <span className="ml-auto text-xs text-primary-600">✓</span>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

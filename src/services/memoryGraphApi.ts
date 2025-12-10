@@ -18,6 +18,7 @@ export type SearchResponse = {
   distances?: number[][];
   embeddings?: number[][][];
   uris?: string[][];
+  queryLanguage?: LanguageInfo;
 };
 
 export type CreateMemoryRequest = {
@@ -42,6 +43,22 @@ export type UpdateMemoryResponse = {
   id: string;
   tags?: string[];
   language?: LanguageInfo;
+};
+
+export type TranslatedMemoryResponse = {
+  ok: boolean;
+  id: string;
+  document: string;
+  original_document?: string;
+  original_language?: string;
+  display_language?: string;
+  translated_texts?: Record<string, string>;
+  available_languages?: string[];
+  has_translations?: boolean;
+  person?: string;
+  event?: string;
+  tags?: string[];
+  media?: string[];
 };
 
 import { authService } from './authService';
@@ -150,6 +167,14 @@ export async function bulkDeleteMemories(ids: string[]) {
   });
   if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
   return res.json() as Promise<{ ok: boolean; deleted: number }>;
+}
+
+export async function getTranslatedMemory(memoryId: string, lang: string) {
+  const res = await fetch(`${base}/api/memory-graph/memories/${encodeURIComponent(memoryId)}/translated?lang=${encodeURIComponent(lang)}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
+  return res.json() as Promise<TranslatedMemoryResponse>;
 }
 
 

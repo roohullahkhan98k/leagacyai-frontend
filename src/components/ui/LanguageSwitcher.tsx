@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, ChevronDown } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import i18n from '../../i18n/config';
 
 const languages = [
   { code: 'en', name: 'English', nativeName: 'English' },
@@ -19,11 +20,13 @@ const languages = [
 ];
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  // Always call hooks unconditionally - if useTranslation fails, it's a configuration issue
+  const { i18n: i18nFromHook } = useTranslation();
+  const i18nInstance = i18nFromHook || i18n;
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const currentLanguage = languages.find(lang => lang.code === i18nInstance.language) || languages[0];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -37,7 +40,7 @@ const LanguageSwitcher = () => {
   }, []);
 
   const changeLanguage = (langCode: string) => {
-    i18n.changeLanguage(langCode);
+    i18nInstance.changeLanguage(langCode);
     setIsOpen(false);
     
     // Always keep UI in LTR, only content text can be RTL
@@ -47,10 +50,10 @@ const LanguageSwitcher = () => {
 
   // Set initial direction on mount - always LTR for UI
   useEffect(() => {
-    const currentLang = i18n.language || 'en';
+    const currentLang = i18nInstance.language || 'en';
     document.documentElement.setAttribute('dir', 'ltr');
     document.documentElement.setAttribute('lang', currentLang);
-  }, [i18n.language]);
+  }, [i18nInstance.language]);
 
   return (
     <div className="relative" ref={dropdownRef}>
