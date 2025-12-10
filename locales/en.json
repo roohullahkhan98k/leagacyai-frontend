@@ -227,7 +227,14 @@
     "howStep2": "AI Processing",
     "howStep2Desc": "Advanced neural networks create a digital fingerprint of your voice, capturing tone, pitch, and speaking patterns.",
     "howStep3": "Generate Speech",
-    "howStep3Desc": "Type any text and hear it spoken in your own voice with natural intonation and emotion."
+    "howStep3Desc": "Type any text and hear it spoken in your own voice with natural intonation and emotion.",
+    "accentLabel": "Accent/Language",
+    "accentDescription": "Select the accent/language for this voice clone",
+    "accentDescriptionGenerate": "Select the accent/language for speech generation",
+    "localStorage": "Local Storage",
+    "localStorageUnlimited": "Local (Unlimited)",
+    "unlimitedClones": "No more 30 clone limit!",
+    "accent": "Accent"
   },
   "avatar": {
     "title": "Avatar Service",

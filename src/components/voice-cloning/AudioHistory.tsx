@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Clock, Play, Download, RefreshCw, Loader2, History as HistoryIcon, Trash2 } from 'lucide-react';
+import { Clock, Play, Download, RefreshCw, Loader2, History as HistoryIcon, Trash2, Globe } from 'lucide-react';
 import { AudioHistoryItem, getAudioHistory, deleteGeneratedAudio } from '../../services/voiceCloningApi';
+import { ACCENTS } from '../../constants/accents';
 import DeleteAudioModal from './DeleteAudioModal';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
@@ -70,6 +71,11 @@ const AudioHistory = () => {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const getAccentName = (accentCode?: string) => {
+    if (!accentCode) return 'Unknown';
+    return ACCENTS.find(a => a.code === accentCode)?.name || accentCode.toUpperCase();
   };
 
   const handlePlay = async (item: AudioHistoryItem) => {
@@ -220,10 +226,24 @@ const AudioHistory = () => {
             <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                       {item.voice_name}
                     </span>
+                    {/* Accent Badge - NEW */}
+                    {(item.accent || item.metadata?.accent) && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                        <Globe className="h-3 w-3 mr-1" />
+                        {getAccentName(item.accent || item.metadata?.accent as string)}
+                      </span>
+                    )}
+                    {/* Duration Badge */}
+                    {item.duration_seconds > 0 && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {formatDuration(item.duration_seconds)}
+                      </span>
+                    )}
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       {formatDate(item.created_at)}
                     </span>
@@ -234,12 +254,6 @@ const AudioHistory = () => {
                   </p>
                   
                   <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-                    {item.duration_seconds > 0 && (
-                      <div className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        <span>{formatDuration(item.duration_seconds)}</span>
-                      </div>
-                    )}
                     {item.file_size_bytes && (
                       <div>
                         {formatFileSize(item.file_size_bytes)}

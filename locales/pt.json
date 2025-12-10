@@ -226,7 +226,14 @@
     "howStep2": "Processamento de IA",
     "howStep2Desc": "Redes neurais avançadas criam uma impressão digital da sua voz, capturando tom, altura e padrões de fala.",
     "howStep3": "Gerar Fala",
-    "howStep3Desc": "Digite qualquer texto e ouça-o falado na sua própria voz com entonação e emoção naturais."
+    "howStep3Desc": "Digite qualquer texto e ouça-o falado na sua própria voz com entonação e emoção naturais.",
+    "accentLabel": "Sotaque/Idioma",
+    "accentDescription": "Selecione o sotaque/idioma para este clone de voz",
+    "accentDescriptionGenerate": "Selecione o sotaque/idioma para a geração de fala",
+    "localStorage": "Armazenamento Local",
+    "localStorageUnlimited": "Local (Ilimitado)",
+    "unlimitedClones": "Sem mais limite de 30 clones!",
+    "accent": "Sotaque"
   },
   "avatar": {
     "title": "Serviço de Avatar",

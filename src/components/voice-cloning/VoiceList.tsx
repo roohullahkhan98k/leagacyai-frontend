@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Trash2, User, Sparkles, Play, MoreVertical, CheckCircle, Calendar, Volume2, Settings, Star } from 'lucide-react';
+import { Trash2, User, Sparkles, Play, MoreVertical, CheckCircle, Calendar, Volume2, Settings, Star, Globe, HardDrive } from 'lucide-react';
 import Button from '../ui/Button';
 import Card, { CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { getVoices, deleteVoice, Voice, CustomVoice } from '../../services/voiceCloningApi';
+import { ACCENTS } from '../../constants/accents';
 import { toast } from 'react-toastify';
 
 interface VoiceListProps {
@@ -172,7 +173,7 @@ const VoiceList = ({ onVoiceSelect, selectedVoiceId, onVoicesUpdated }: VoiceLis
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                               {voice.voice_name}
                             </h4>
@@ -180,6 +181,20 @@ const VoiceList = ({ onVoiceSelect, selectedVoiceId, onVoicesUpdated }: VoiceLis
                               <Star className="h-3 w-3 inline mr-1" />
                               Custom
                             </span>
+                            {/* Local Storage Indicator */}
+                            {(voice.voice_id?.startsWith('local_') || voice.isLocalClone) && (
+                              <span className="px-2 py-1 text-xs rounded-full font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                                <HardDrive className="h-3 w-3 inline mr-1" />
+                                Local (Unlimited)
+                              </span>
+                            )}
+                            {/* Accent Badge */}
+                            {voice.accent && (
+                              <span className="px-2 py-1 text-xs rounded-full font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                                <Globe className="h-3 w-3 inline mr-1" />
+                                {ACCENTS.find(a => a.code === voice.accent)?.name || voice.accent.toUpperCase()}
+                              </span>
+                            )}
                           </div>
                           
                           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">

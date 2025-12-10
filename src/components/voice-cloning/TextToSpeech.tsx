@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Volume2, Download, Play, Pause, User, Settings, Wand2, Clock, FileText, Sliders } from 'lucide-react';
+import { Volume2, Download, Play, Pause, User, Settings, Wand2, Clock, FileText, Sliders, Globe } from 'lucide-react';
 import Button from '../ui/Button';
 import Card, { CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { generateSpeech } from '../../services/voiceCloningApi';
+import { ACCENTS, DEFAULT_ACCENT } from '../../constants/accents';
 import { toast } from 'react-toastify';
 
 interface TextToSpeechProps {
@@ -12,6 +13,7 @@ interface TextToSpeechProps {
 
 const TextToSpeech = ({ selectedVoiceId, selectedVoiceName }: TextToSpeechProps) => {
   const [text, setText] = useState('');
+  const [accent, setAccent] = useState<string>(DEFAULT_ACCENT); // REQUIRED: Accent selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -54,6 +56,7 @@ const TextToSpeech = ({ selectedVoiceId, selectedVoiceName }: TextToSpeechProps)
       const payload = {
         text: text.trim(),
         voiceId: selectedVoiceId,
+        accent: accent, // REQUIRED - Must include accent
         voiceName: selectedVoiceName,
         modelId: modelId,
         outputFormat: outputFormat,
@@ -263,6 +266,30 @@ const TextToSpeech = ({ selectedVoiceId, selectedVoiceName }: TextToSpeechProps)
             </div>
             <span>{characterCount}/5000</span>
           </div>
+        </div>
+
+        {/* REQUIRED: Accent Selector */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <Globe className="h-4 w-4 inline mr-1" />
+            Accent/Language *
+          </label>
+          <select
+            value={accent}
+            onChange={(e) => setAccent(e.target.value)}
+            required
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+            disabled={isGenerating || !selectedVoiceId}
+          >
+            {ACCENTS.map(acc => (
+              <option key={acc.code} value={acc.code}>
+                {acc.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Select the accent/language for speech generation
+          </p>
         </div>
 
         {/* Advanced Settings */}

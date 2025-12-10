@@ -226,7 +226,14 @@
     "howStep2": "Elaborazione IA",
     "howStep2Desc": "Le reti neurali avanzate creano un'impronta digitale della tua voce, catturando tono, altezza e modelli di parlato.",
     "howStep3": "Genera Parlato",
-    "howStep3Desc": "Digita qualsiasi testo e ascoltalo pronunciato nella tua stessa voce con intonazione ed emozione naturali."
+    "howStep3Desc": "Digita qualsiasi testo e ascoltalo pronunciato nella tua stessa voce con intonazione ed emozione naturali.",
+    "accentLabel": "Accento/Lingua",
+    "accentDescription": "Seleziona l'accento/lingua per questo clone vocale",
+    "accentDescriptionGenerate": "Seleziona l'accento/lingua per la generazione vocale",
+    "localStorage": "Archiviazione Locale",
+    "localStorageUnlimited": "Locale (Illimitato)",
+    "unlimitedClones": "Niente più limite di 30 cloni!",
+    "accent": "Accento"
   },
   "avatar": {
     "title": "Servizio Avatar",

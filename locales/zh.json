@@ -226,7 +226,14 @@
     "howStep2": "AI处理",
     "howStep2Desc": "先进的神经网络创建您语音的数字指纹，捕获音调、音高和说话模式。",
     "howStep3": "生成语音",
-    "howStep3Desc": "输入任何文本，听到它用您自己的语音以自然的语调和情感说出来。"
+    "howStep3Desc": "输入任何文本，听到它用您自己的语音以自然的语调和情感说出来。",
+    "accentLabel": "口音/语言",
+    "accentDescription": "为此语音克隆选择口音/语言",
+    "accentDescriptionGenerate": "为语音生成选择口音/语言",
+    "localStorage": "本地存储",
+    "localStorageUnlimited": "本地（无限制）",
+    "unlimitedClones": "不再有30个克隆的限制！",
+    "accent": "口音"
   },
   "avatar": {
     "title": "头像服务",

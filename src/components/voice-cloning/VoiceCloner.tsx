@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, User, Clock, CheckCircle, AlertCircle, Info, Brain, RotateCcw } from 'lucide-react';
+import { Sparkles, User, Clock, CheckCircle, AlertCircle, Info, Brain, RotateCcw, Globe } from 'lucide-react';
 import Button from '../ui/Button';
 import Card, { CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { cloneVoice, CloneVoiceRequest } from '../../services/voiceCloningApi';
+import { ACCENTS, DEFAULT_ACCENT } from '../../constants/accents';
 import { toast } from 'react-toastify';
 
 interface VoiceClonerProps {
@@ -13,6 +14,7 @@ interface VoiceClonerProps {
 const VoiceCloner = ({ audioBlob, onVoiceCloned }: VoiceClonerProps) => {
   const [voiceName, setVoiceName] = useState('');
   const [description, setDescription] = useState('');
+  const [accent, setAccent] = useState<string>(DEFAULT_ACCENT); // REQUIRED: Accent selection
   const [isCloning, setIsCloning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -69,7 +71,8 @@ const VoiceCloner = ({ audioBlob, onVoiceCloned }: VoiceClonerProps) => {
       const payload: CloneVoiceRequest = {
         audio: audioFile,
         voiceName: voiceName.trim(),
-        description: description.trim() || undefined
+        description: description.trim() || undefined,
+        accent: accent // REQUIRED - Must include accent
       };
 
       // Start progress simulation
@@ -255,6 +258,30 @@ const VoiceCloner = ({ audioBlob, onVoiceCloned }: VoiceClonerProps) => {
                 {description.length}/200
               </span>
             </div>
+          </div>
+
+          {/* REQUIRED: Accent Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Globe className="h-4 w-4 inline mr-1" />
+              Accent/Language *
+            </label>
+            <select
+              value={accent}
+              onChange={(e) => setAccent(e.target.value)}
+              required
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+              disabled={isCloning}
+            >
+              {ACCENTS.map(acc => (
+                <option key={acc.code} value={acc.code}>
+                  {acc.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Select the accent/language for this voice clone
+            </p>
           </div>
         </div>
 

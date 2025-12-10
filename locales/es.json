@@ -226,7 +226,14 @@
     "howStep2": "Procesamiento de IA",
     "howStep2Desc": "Las redes neuronales avanzadas crean una huella digital de tu voz, capturando tono, tono y patrones de habla.",
     "howStep3": "Generar Habla",
-    "howStep3Desc": "Escribe cualquier texto y escúchalo hablado en tu propia voz con entonación y emoción naturales."
+    "howStep3Desc": "Escribe cualquier texto y escúchalo hablado en tu propia voz con entonación y emoción naturales.",
+    "accentLabel": "Acento/Idioma",
+    "accentDescription": "Selecciona el acento/idioma para este clon de voz",
+    "accentDescriptionGenerate": "Selecciona el acento/idioma para la generación de voz",
+    "localStorage": "Almacenamiento Local",
+    "localStorageUnlimited": "Local (Ilimitado)",
+    "unlimitedClones": "¡Ya no hay límite de 30 clones!",
+    "accent": "Acento"
   },
   "avatar": {
     "title": "Servicio de Avatar",

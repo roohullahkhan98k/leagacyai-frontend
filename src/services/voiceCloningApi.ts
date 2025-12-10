@@ -12,6 +12,7 @@ export interface CloneVoiceRequest {
   audio: File;
   voiceName: string;
   description?: string;
+  accent: string; // REQUIRED: Accent code (en, ar, hi, es, fr, de, etc.)
 }
 
 export interface CloneVoiceResponse {
@@ -19,12 +20,15 @@ export interface CloneVoiceResponse {
   voiceId: string;
   name: string;
   status: string;
+  accent?: string;
+  sampleFilePath?: string;
   timestamp: string;
 }
 
 export interface GenerateSpeechRequest {
   text: string;
   voiceId: string;
+  accent: string; // REQUIRED: Accent code for generation
   modelId?: string;
   outputFormat?: string;
   voiceSettings?: {
@@ -36,10 +40,13 @@ export interface GenerateSpeechRequest {
 export interface GenerateSpeechResponse {
   success: boolean;
   audioUrl: string;
+  audioPath?: string;
   filename: string;
   duration: number;
   text: string;
   voiceId: string;
+  accent?: string;
+  isLocalClone?: boolean; // NEW: Indicates if local clone was used
   timestamp: string;
 }
 
@@ -63,10 +70,12 @@ export interface CustomVoice {
   voice_id: string;
   voice_name: string;
   sample_file_path: string;
+  accent?: string;
   metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   isCustom: true;
+  isLocalClone?: boolean; // NEW: Indicates if stored locally
 }
 
 export interface AudioHistoryItem {
@@ -74,11 +83,17 @@ export interface AudioHistoryItem {
   user_id: string;
   voice_id: string;
   voice_name: string;
+  accent?: string; // NEW: Accent used for generation
   text: string;
   audio_file_path: string;
   duration_seconds: number;
   file_size_bytes: number;
-  metadata?: Record<string, unknown>;
+  metadata?: {
+    accent?: string;
+    model_id?: string;
+    isLocalClone?: boolean;
+    [key: string]: unknown;
+  };
   created_at: string;
   updated_at: string;
 }
@@ -133,6 +148,7 @@ export async function cloneVoice(payload: CloneVoiceRequest): Promise<CloneVoice
   const formData = new FormData();
   formData.append('audio', payload.audio);
   formData.append('voiceName', payload.voiceName);
+  formData.append('accent', payload.accent); // REQUIRED - Must include accent
   if (payload.description) {
     formData.append('description', payload.description);
   }
@@ -147,12 +163,13 @@ export async function cloneVoice(payload: CloneVoiceRequest): Promise<CloneVoice
 }
 
 export async function generateSpeech(payload: GenerateSpeechRequest & { voiceName?: string }): Promise<GenerateSpeechResponse> {
-  const res = await fetch(`${base}/api/voice-cloning/generate-speech`, {
+  const res = await fetch(`${base}/api/voice-cloning/generate`, {
     method: 'POST',
     headers: getAuthHeadersWithJSON(),
     body: JSON.stringify({
       text: payload.text,
       voiceId: payload.voiceId,
+      accent: payload.accent, // REQUIRED - Must include accent
       voiceName: payload.voiceName,
       modelId: payload.modelId || 'eleven_multilingual_v2',
       outputFormat: payload.outputFormat || 'mp3_44100_128',

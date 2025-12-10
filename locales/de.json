@@ -226,7 +226,14 @@
     "howStep2": "KI-Verarbeitung",
     "howStep2Desc": "Fortschrittliche neuronale Netze erstellen einen digitalen Fingerabdruck Ihrer Stimme und erfassen Ton, Tonhöhe und Sprechmuster.",
     "howStep3": "Sprache generieren",
-    "howStep3Desc": "Geben Sie beliebigen Text ein und hören Sie ihn in Ihrer eigenen Stimme mit natürlicher Intonation und Emotion gesprochen."
+    "howStep3Desc": "Geben Sie beliebigen Text ein und hören Sie ihn in Ihrer eigenen Stimme mit natürlicher Intonation und Emotion gesprochen.",
+    "accentLabel": "Akzent/Sprache",
+    "accentDescription": "Wählen Sie den Akzent/die Sprache für diesen Stimmklon",
+    "accentDescriptionGenerate": "Wählen Sie den Akzent/die Sprache für die Sprachgenerierung",
+    "localStorage": "Lokaler Speicher",
+    "localStorageUnlimited": "Lokal (Unbegrenzt)",
+    "unlimitedClones": "Keine 30-Klon-Grenze mehr!",
+    "accent": "Akzent"
   },
   "avatar": {
     "title": "Avatar-Service",

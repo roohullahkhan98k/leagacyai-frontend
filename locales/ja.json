@@ -226,7 +226,14 @@
     "howStep2": "AI処理",
     "howStep2Desc": "高度なニューラルネットワークが音声のデジタル指紋を作成し、トーン、ピッチ、話し方のパターンをキャプチャします。",
     "howStep3": "音声を生成",
-    "howStep3Desc": "任意のテキストを入力し、自然なイントネーションと感情で自分の音声で話されているのを聞いてください。"
+    "howStep3Desc": "任意のテキストを入力し、自然なイントネーションと感情で自分の音声で話されているのを聞いてください。",
+    "accentLabel": "アクセント/言語",
+    "accentDescription": "この音声クローンのアクセント/言語を選択",
+    "accentDescriptionGenerate": "音声生成のアクセント/言語を選択",
+    "localStorage": "ローカルストレージ",
+    "localStorageUnlimited": "ローカル（無制限）",
+    "unlimitedClones": "30クローンの制限はもうありません！",
+    "accent": "アクセント"
   },
   "avatar": {
     "title": "アバターサービス",
