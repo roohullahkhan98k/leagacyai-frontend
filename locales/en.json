@@ -25,7 +25,8 @@
   "header": {
     "login": "Login",
     "signUp": "Sign Up",
-    "logout": "Logout"
+    "logout": "Logout",
+    "billing": "Billing"
   },
   "home": {
     "title": "Legacy AI",
@@ -98,6 +99,41 @@
     "ctaTitle": "Ready to Get Started?",
     "ctaDescription": "Join thousands of users who are already using our platform to enhance their workflow.",
     "backToHome": "Back to Home"
+  },
+  "billing": {
+    "title": "Billing Dashboard",
+    "subtitle": "Manage your subscription and billing information",
+    "loading": "Loading billing information...",
+    "error": "Error Loading Billing",
+    "noSubscription": "No Active Subscription",
+    "noSubscriptionDescription": "You don't have an active subscription. Choose a plan to get started.",
+    "viewPlans": "View Plans",
+    "currentPlan": "Current Plan",
+    "currentPeriod": "Current Period",
+    "willCancelAtPeriodEnd": "Will cancel at period end",
+    "changePlan": "Change Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "switch": "Switch",
+    "alreadyOnPlan": "You are already on this plan",
+    "confirmChangePlan": "Are you sure you want to change your plan? Proration will be handled automatically.",
+    "planChanged": "Plan changed successfully",
+    "changePlanError": "Failed to change plan",
+    "cancelSubscription": "Cancel Subscription",
+    "resumeSubscription": "Resume Subscription",
+    "confirmCancel": "Are you sure you want to cancel your subscription? You will retain access until the end of your billing period.",
+    "cancelSuccess": "Subscription will cancel at period end",
+    "cancelError": "Failed to cancel subscription",
+    "resumeSuccess": "Subscription resumed successfully",
+    "resumeError": "Failed to resume subscription",
+    "paymentMethod": "Payment Method",
+    "expires": "Expires",
+    "upcomingInvoice": "Upcoming Invoice",
+    "nextPayment": "Next Payment",
+    "period": "Period",
+    "invoiceHistory": "Invoice History",
+    "viewInvoice": "View Invoice",
+    "downloadPDF": "Download PDF"
   },
   "auth": {
     "email": "Email",

@@ -43,6 +43,63 @@ export interface CheckoutResponse {
   error?: string;
 }
 
+export interface PaymentMethod {
+  id: string;
+  type: string;
+  card?: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  };
+}
+
+export interface Invoice {
+  id: string;
+  number: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created: string;
+  periodStart: string;
+  periodEnd: string;
+  hostedInvoiceUrl?: string;
+  invoicePdf?: string;
+}
+
+export interface UpcomingInvoice {
+  amount: number;
+  currency: string;
+  periodStart: string;
+  periodEnd: string;
+  nextPaymentAttempt: string;
+}
+
+export interface BillingDashboard {
+  success: boolean;
+  hasSubscription: boolean;
+  subscription?: {
+    id: string;
+    plan: 'personal' | 'premium' | 'ultimate';
+    status: string;
+    currentPeriodStart: string;
+    currentPeriodEnd: string;
+    cancelAtPeriodEnd: boolean;
+    canceledAt?: string | null;
+  };
+  paymentMethod?: PaymentMethod;
+  invoices?: Invoice[];
+  upcomingInvoice?: UpcomingInvoice;
+  error?: string;
+}
+
+export interface ChangePlanResponse {
+  success: boolean;
+  message?: string;
+  subscription?: SubscriptionStatus;
+  error?: string;
+}
+
 /**
  * Fetch available subscription plans
  */
@@ -133,6 +190,67 @@ export async function getSubscriptionStatus(): Promise<SubscriptionStatus> {
 }
 
 /**
+ * Get billing dashboard with complete billing information
+ */
+export async function getBillingDashboard(): Promise<BillingDashboard> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/subscription/billing`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to fetch billing information' }));
+      throw new Error(errorData.error || 'Failed to fetch billing information');
+    }
+
+    const data: BillingDashboard = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching billing dashboard:', error);
+    throw error;
+  }
+}
+
+/**
+ * Change plan (upgrade/downgrade)
+ */
+export async function changePlan(planType: 'personal' | 'premium' | 'ultimate'): Promise<ChangePlanResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/subscription/change-plan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ planType })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to change plan' }));
+      throw new Error(errorData.error || 'Failed to change plan');
+    }
+
+    const data: ChangePlanResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Change plan error:', error);
+    throw error;
+  }
+}
+
+/**
  * Cancel subscription
  */
 export async function cancelSubscription(): Promise<{ success: boolean; message?: string; error?: string }> {
@@ -158,6 +276,36 @@ export async function cancelSubscription(): Promise<{ success: boolean; message?
     return data;
   } catch (error) {
     console.error('Cancel subscription error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Resume subscription
+ */
+export async function resumeSubscription(): Promise<{ success: boolean; message?: string; subscription?: SubscriptionStatus; error?: string }> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/subscription/resume`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to resume subscription' }));
+      throw new Error(errorData.error || 'Failed to resume subscription');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Resume subscription error:', error);
     throw error;
   }
 }

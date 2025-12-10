@@ -24,7 +24,8 @@
   "header": {
     "login": "ログイン",
     "signUp": "サインアップ",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "billing": "請求"
   },
   "home": {
     "title": "Legacy AI",
@@ -97,6 +98,41 @@
     "ctaTitle": "始める準備はできましたか？",
     "ctaDescription": "すでにワークフローを改善するために当社のプラットフォームを使用している何千人ものユーザーに参加してください。",
     "backToHome": "ホームに戻る"
+  },
+  "billing": {
+    "title": "請求ダッシュボード",
+    "subtitle": "サブスクリプションと請求情報を管理",
+    "loading": "請求情報を読み込み中...",
+    "error": "請求の読み込みエラー",
+    "noSubscription": "アクティブなサブスクリプションなし",
+    "noSubscriptionDescription": "アクティブなサブスクリプションがありません。プランを選択して開始してください。",
+    "viewPlans": "プランを表示",
+    "currentPlan": "現在のプラン",
+    "currentPeriod": "現在の期間",
+    "willCancelAtPeriodEnd": "期間終了時にキャンセルされます",
+    "changePlan": "プランを変更",
+    "upgrade": "アップグレード",
+    "downgrade": "ダウングレード",
+    "switch": "切り替え",
+    "alreadyOnPlan": "すでにこのプランにいます",
+    "confirmChangePlan": "プランを変更してもよろしいですか？按分計算は自動的に処理されます。",
+    "planChanged": "プランが正常に変更されました",
+    "changePlanError": "プランの変更に失敗しました",
+    "cancelSubscription": "サブスクリプションをキャンセル",
+    "resumeSubscription": "サブスクリプションを再開",
+    "confirmCancel": "サブスクリプションをキャンセルしてもよろしいですか？請求期間の終了までアクセスが維持されます。",
+    "cancelSuccess": "サブスクリプションは期間終了時にキャンセルされます",
+    "cancelError": "サブスクリプションのキャンセルに失敗しました",
+    "resumeSuccess": "サブスクリプションが正常に再開されました",
+    "resumeError": "サブスクリプションの再開に失敗しました",
+    "paymentMethod": "支払い方法",
+    "expires": "有効期限",
+    "upcomingInvoice": "次の請求書",
+    "nextPayment": "次の支払い",
+    "period": "期間",
+    "invoiceHistory": "請求履歴",
+    "viewInvoice": "請求書を表示",
+    "downloadPDF": "PDFをダウンロード"
   },
   "auth": {
     "email": "メール",

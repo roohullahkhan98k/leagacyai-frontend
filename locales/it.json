@@ -24,7 +24,8 @@
   "header": {
     "login": "Accedi",
     "signUp": "Registrati",
-    "logout": "Esci"
+    "logout": "Esci",
+    "billing": "Fatturazione"
   },
   "home": {
     "title": "Legacy AI",
@@ -97,6 +98,41 @@
     "ctaTitle": "Pronto a Iniziare?",
     "ctaDescription": "Unisciti a migliaia di utenti che stanno già utilizzando la nostra piattaforma per migliorare il loro flusso di lavoro.",
     "backToHome": "Torna alla Home"
+  },
+  "billing": {
+    "title": "Dashboard di Fatturazione",
+    "subtitle": "Gestisci il tuo abbonamento e le informazioni di fatturazione",
+    "loading": "Caricamento informazioni di fatturazione...",
+    "error": "Errore nel Caricamento della Fatturazione",
+    "noSubscription": "Nessun Abbonamento Attivo",
+    "noSubscriptionDescription": "Non hai un abbonamento attivo. Scegli un piano per iniziare.",
+    "viewPlans": "Visualizza Piani",
+    "currentPlan": "Piano Corrente",
+    "currentPeriod": "Periodo Corrente",
+    "willCancelAtPeriodEnd": "Verrà annullato alla fine del periodo",
+    "changePlan": "Cambia Piano",
+    "upgrade": "Aggiorna",
+    "downgrade": "Riduci",
+    "switch": "Cambia",
+    "alreadyOnPlan": "Sei già su questo piano",
+    "confirmChangePlan": "Sei sicuro di voler cambiare il tuo piano? La ripartizione proporzionale sarà gestita automaticamente.",
+    "planChanged": "Piano cambiato con successo",
+    "changePlanError": "Errore nel cambiare il piano",
+    "cancelSubscription": "Annulla Abbonamento",
+    "resumeSubscription": "Riprendi Abbonamento",
+    "confirmCancel": "Sei sicuro di voler annullare il tuo abbonamento? Mantieni l'accesso fino alla fine del tuo periodo di fatturazione.",
+    "cancelSuccess": "L'abbonamento verrà annullato alla fine del periodo",
+    "cancelError": "Errore nell'annullamento dell'abbonamento",
+    "resumeSuccess": "Abbonamento ripreso con successo",
+    "resumeError": "Errore nella ripresa dell'abbonamento",
+    "paymentMethod": "Metodo di Pagamento",
+    "expires": "Scade",
+    "upcomingInvoice": "Fattura Imminente",
+    "nextPayment": "Prossimo Pagamento",
+    "period": "Periodo",
+    "invoiceHistory": "Cronologia Fatture",
+    "viewInvoice": "Visualizza Fattura",
+    "downloadPDF": "Scarica PDF"
   },
   "auth": {
     "email": "E-mail",

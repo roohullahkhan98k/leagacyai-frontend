@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogOut, User, Menu, X, LogIn, UserPlus, Palette, Globe } from 'lucide-react';
+import { LogOut, User, Menu, X, LogIn, UserPlus, Palette, Globe, CreditCard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../ui/ThemeToggle';
 import LanguageSwitcher from '../ui/LanguageSwitcher';
@@ -106,6 +106,14 @@ const Header = () => {
                       </p>
                     </div>
                   </div>
+                  <Link to="/billing">
+                    <button
+                      className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+                      title="Billing"
+                    >
+                      <CreditCard className="h-5 w-5" />
+                    </button>
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"

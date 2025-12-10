@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage';
 import PricingPage from './pages/PricingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
+import BillingDashboardPage from './pages/BillingDashboardPage';
 import InterviewPage from './features/ai-interview';
 import MemoryGraphPage from './features/memory-graph';
 import VoiceCloningPage from './features/voice-cloning';
@@ -78,6 +79,14 @@ function AppContent() {
             <Route path="/subscription/cancel" element={<PaymentCancelPage />} />
             
             {/* Protected routes */}
+            <Route 
+              path="/billing" 
+              element={
+                <ProtectedRoute>
+                  <BillingDashboardPage />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/interview" 
               element={

@@ -24,7 +24,8 @@
   "header": {
     "login": "登录",
     "signUp": "注册",
-    "logout": "登出"
+    "logout": "登出",
+    "billing": "账单"
   },
   "home": {
     "title": "Legacy AI",
@@ -97,6 +98,41 @@
     "ctaTitle": "准备开始了吗？",
     "ctaDescription": "加入数千名已经在使用我们的平台来改善工作流程的用户。",
     "backToHome": "返回首页"
+  },
+  "billing": {
+    "title": "账单仪表板",
+    "subtitle": "管理您的订阅和账单信息",
+    "loading": "正在加载账单信息...",
+    "error": "加载账单错误",
+    "noSubscription": "没有活动订阅",
+    "noSubscriptionDescription": "您没有活动订阅。选择一个计划开始。",
+    "viewPlans": "查看计划",
+    "currentPlan": "当前计划",
+    "currentPeriod": "当前期间",
+    "willCancelAtPeriodEnd": "将在期间结束时取消",
+    "changePlan": "更改计划",
+    "upgrade": "升级",
+    "downgrade": "降级",
+    "switch": "切换",
+    "alreadyOnPlan": "您已在此计划上",
+    "confirmChangePlan": "您确定要更改计划吗？按比例分配将自动处理。",
+    "planChanged": "计划更改成功",
+    "changePlanError": "更改计划失败",
+    "cancelSubscription": "取消订阅",
+    "resumeSubscription": "恢复订阅",
+    "confirmCancel": "您确定要取消订阅吗？您将保留访问权限直到计费期结束。",
+    "cancelSuccess": "订阅将在期间结束时取消",
+    "cancelError": "取消订阅失败",
+    "resumeSuccess": "订阅已成功恢复",
+    "resumeError": "恢复订阅失败",
+    "paymentMethod": "付款方式",
+    "expires": "到期",
+    "upcomingInvoice": "即将到来的发票",
+    "nextPayment": "下次付款",
+    "period": "期间",
+    "invoiceHistory": "发票历史",
+    "viewInvoice": "查看发票",
+    "downloadPDF": "下载PDF"
   },
   "auth": {
     "email": "电子邮件",

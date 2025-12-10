@@ -24,7 +24,8 @@
   "header": {
     "login": "Entrar",
     "signUp": "Registrar",
-    "logout": "Sair"
+    "logout": "Sair",
+    "billing": "Faturamento"
   },
   "home": {
     "title": "Legacy AI",
@@ -97,6 +98,41 @@
     "ctaTitle": "Pronto para Começar?",
     "ctaDescription": "Junte-se a milhares de usuários que já estão usando nossa plataforma para melhorar seu fluxo de trabalho.",
     "backToHome": "Voltar para o Início"
+  },
+  "billing": {
+    "title": "Painel de Faturamento",
+    "subtitle": "Gerencie sua assinatura e informações de faturamento",
+    "loading": "Carregando informações de faturamento...",
+    "error": "Erro ao Carregar Faturamento",
+    "noSubscription": "Nenhuma Assinatura Ativa",
+    "noSubscriptionDescription": "Você não tem uma assinatura ativa. Escolha um plano para começar.",
+    "viewPlans": "Ver Planos",
+    "currentPlan": "Plano Atual",
+    "currentPeriod": "Período Atual",
+    "willCancelAtPeriodEnd": "Será cancelado no final do período",
+    "changePlan": "Alterar Plano",
+    "upgrade": "Atualizar",
+    "downgrade": "Reduzir",
+    "switch": "Trocar",
+    "alreadyOnPlan": "Você já está neste plano",
+    "confirmChangePlan": "Tem certeza de que deseja alterar seu plano? O rateio será tratado automaticamente.",
+    "planChanged": "Plano alterado com sucesso",
+    "changePlanError": "Falha ao alterar o plano",
+    "cancelSubscription": "Cancelar Assinatura",
+    "resumeSubscription": "Retomar Assinatura",
+    "confirmCancel": "Tem certeza de que deseja cancelar sua assinatura? Você manterá o acesso até o final do seu período de cobrança.",
+    "cancelSuccess": "A assinatura será cancelada no final do período",
+    "cancelError": "Falha ao cancelar a assinatura",
+    "resumeSuccess": "Assinatura retomada com sucesso",
+    "resumeError": "Falha ao retomar a assinatura",
+    "paymentMethod": "Método de Pagamento",
+    "expires": "Expira",
+    "upcomingInvoice": "Próxima Fatura",
+    "nextPayment": "Próximo Pagamento",
+    "period": "Período",
+    "invoiceHistory": "Histórico de Faturas",
+    "viewInvoice": "Ver Fatura",
+    "downloadPDF": "Baixar PDF"
   },
   "auth": {
     "email": "E-mail",

@@ -24,7 +24,8 @@
   "header": {
     "login": "로그인",
     "signUp": "가입",
-    "logout": "로그아웃"
+    "logout": "로그아웃",
+    "billing": "결제"
   },
   "home": {
     "title": "Legacy AI",
@@ -97,6 +98,41 @@
     "ctaTitle": "시작할 준비가 되셨나요?",
     "ctaDescription": "이미 워크플로우를 개선하기 위해 당사 플랫폼을 사용하고 있는 수천 명의 사용자에 합류하세요.",
     "backToHome": "홈으로 돌아가기"
+  },
+  "billing": {
+    "title": "결제 대시보드",
+    "subtitle": "구독 및 결제 정보 관리",
+    "loading": "결제 정보 로딩 중...",
+    "error": "결제 로드 오류",
+    "noSubscription": "활성 구독 없음",
+    "noSubscriptionDescription": "활성 구독이 없습니다. 시작하려면 플랜을 선택하세요.",
+    "viewPlans": "플랜 보기",
+    "currentPlan": "현재 플랜",
+    "currentPeriod": "현재 기간",
+    "willCancelAtPeriodEnd": "기간 종료 시 취소됩니다",
+    "changePlan": "플랜 변경",
+    "upgrade": "업그레이드",
+    "downgrade": "다운그레이드",
+    "switch": "전환",
+    "alreadyOnPlan": "이미 이 플랜에 있습니다",
+    "confirmChangePlan": "플랜을 변경하시겠습니까? 비례 배분은 자동으로 처리됩니다.",
+    "planChanged": "플랜이 성공적으로 변경되었습니다",
+    "changePlanError": "플랜 변경 실패",
+    "cancelSubscription": "구독 취소",
+    "resumeSubscription": "구독 재개",
+    "confirmCancel": "구독을 취소하시겠습니까? 청구 기간이 끝날 때까지 액세스가 유지됩니다.",
+    "cancelSuccess": "구독은 기간 종료 시 취소됩니다",
+    "cancelError": "구독 취소 실패",
+    "resumeSuccess": "구독이 성공적으로 재개되었습니다",
+    "resumeError": "구독 재개 실패",
+    "paymentMethod": "결제 방법",
+    "expires": "만료",
+    "upcomingInvoice": "다가오는 청구서",
+    "nextPayment": "다음 결제",
+    "period": "기간",
+    "invoiceHistory": "청구서 내역",
+    "viewInvoice": "청구서 보기",
+    "downloadPDF": "PDF 다운로드"
   },
   "auth": {
     "email": "이메일",
