@@ -36,6 +36,7 @@ import {
   type UsageResponse
 } from '../services/subscriptionService';
 import { toast } from 'react-toastify';
+import DowngradeBlockedModal from '../components/modals/DowngradeBlockedModal';
 
 // Plan Change Modal Component
 interface PlanChangeModalProps {
@@ -282,6 +283,9 @@ const BillingDashboardPage = () => {
   // Modal states
   const [showPlanChangeModal, setShowPlanChangeModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [downgradeWarnings, setDowngradeWarnings] = useState<any[]>([]);
+  const [downgradeMessage, setDowngradeMessage] = useState('');
   const [selectedPlan, setSelectedPlan] = useState<{
     key: 'personal' | 'premium' | 'ultimate';
     name: string;
@@ -372,8 +376,21 @@ const BillingDashboardPage = () => {
         setShowPlanChangeModal(false);
         setSelectedPlan(null);
         await fetchBilling();
+        await fetchUsage(); // Refresh usage after plan change
       }
     } catch (err: any) {
+      // Check if it's a downgrade blocked error
+      if (err?.response?.status === 403 || err?.status === 403) {
+        const errorData = err?.response?.data || err?.data || err;
+        if (errorData.error === 'Downgrade not allowed' && (errorData.warnings || errorData.blockedFeatures)) {
+          setDowngradeWarnings(errorData.warnings || errorData.blockedFeatures || []);
+          setDowngradeMessage(errorData.message || 'Cannot downgrade: You have features that exceed the new plan limits.');
+          setShowPlanChangeModal(false);
+          setShowDowngradeModal(true);
+          setActionLoading(null);
+          return;
+        }
+      }
       toast.error(err.message || t('billing.changePlanError'));
     } finally {
       setActionLoading(null);
@@ -978,6 +995,17 @@ const BillingDashboardPage = () => {
         onConfirm={handleCancel}
         periodEnd={billing?.subscription?.currentPeriodEnd}
         isLoading={actionLoading === 'cancel'}
+      />
+
+      <DowngradeBlockedModal
+        isOpen={showDowngradeModal}
+        onClose={() => {
+          setShowDowngradeModal(false);
+          setDowngradeWarnings([]);
+          setDowngradeMessage('');
+        }}
+        warnings={downgradeWarnings}
+        message={downgradeMessage}
       />
     </div>
   );

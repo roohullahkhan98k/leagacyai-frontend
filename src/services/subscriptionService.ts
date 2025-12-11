@@ -241,6 +241,22 @@ export async function getBillingDashboard(): Promise<BillingDashboard> {
   }
 }
 
+export interface DowngradeWarning {
+  feature: string;
+  currentUsage: number;
+  newLimit: number;
+  overage: number;
+  message: string;
+}
+
+export interface ChangePlanErrorResponse {
+  success: false;
+  error: string;
+  message: string;
+  warnings?: DowngradeWarning[];
+  blockedFeatures?: DowngradeWarning[];
+}
+
 /**
  * Change plan (upgrade/downgrade)
  */
@@ -261,8 +277,21 @@ export async function changePlan(planType: 'personal' | 'premium' | 'ultimate'):
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to change plan' }));
-      throw new Error(errorData.error || 'Failed to change plan');
+      const errorData: ChangePlanErrorResponse = await response.json().catch(() => ({ 
+        error: 'Failed to change plan',
+        success: false,
+        message: 'Failed to change plan'
+      }));
+      
+      // Create error object with response structure for error handler
+      const errorWithResponse = {
+        response: { status: response.status, data: errorData },
+        status: response.status,
+        data: errorData,
+        message: errorData.message || errorData.error || 'Failed to change plan'
+      };
+      
+      throw errorWithResponse;
     }
 
     const data: ChangePlanResponse = await response.json();
