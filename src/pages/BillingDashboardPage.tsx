@@ -37,6 +37,8 @@ import {
 } from '../services/subscriptionService';
 import { toast } from 'react-toastify';
 import DowngradeBlockedModal from '../components/modals/DowngradeBlockedModal';
+import DowngradePreviewModal from '../components/modals/DowngradePreviewModal';
+import { checkDowngrade, type DowngradeCheckResponse } from '../services/subscriptionService';
 
 // Plan Change Modal Component
 interface PlanChangeModalProps {
@@ -284,8 +286,10 @@ const BillingDashboardPage = () => {
   const [showPlanChangeModal, setShowPlanChangeModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [showDowngradePreview, setShowDowngradePreview] = useState(false);
   const [downgradeWarnings, setDowngradeWarnings] = useState<any[]>([]);
   const [downgradeMessage, setDowngradeMessage] = useState('');
+  const [downgradeCheckData, setDowngradeCheckData] = useState<DowngradeCheckResponse | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<{
     key: 'personal' | 'premium' | 'ultimate';
     name: string;
@@ -339,7 +343,7 @@ const BillingDashboardPage = () => {
     }
   };
 
-  const handlePlanChangeClick = (planKey: 'personal' | 'premium' | 'ultimate') => {
+  const handlePlanChangeClick = async (planKey: 'personal' | 'premium' | 'ultimate') => {
     if (!billing?.subscription || !plans) return;
     
     if (billing.subscription.plan === planKey) {
@@ -355,14 +359,36 @@ const BillingDashboardPage = () => {
       (billing.subscription.plan === 'ultimate' && (planKey === 'premium' || planKey === 'personal')) ||
       (billing.subscription.plan === 'premium' && planKey === 'personal');
 
-    setSelectedPlan({
-      key: planKey,
-      name: plan.name,
-      price: plan.price,
-      isUpgrade,
-      isDowngrade
-    });
-    setShowPlanChangeModal(true);
+    // For downgrades, check first before showing confirmation
+    if (isDowngrade) {
+      try {
+        setActionLoading(`check-${planKey}`);
+        const checkData = await checkDowngrade(planKey);
+        setDowngradeCheckData(checkData);
+        setSelectedPlan({
+          key: planKey,
+          name: plan.name,
+          price: plan.price,
+          isUpgrade,
+          isDowngrade
+        });
+        setShowDowngradePreview(true);
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to check downgrade requirements');
+      } finally {
+        setActionLoading(null);
+      }
+    } else {
+      // For upgrades, show normal confirmation modal
+      setSelectedPlan({
+        key: planKey,
+        name: plan.name,
+        price: plan.price,
+        isUpgrade,
+        isDowngrade
+      });
+      setShowPlanChangeModal(true);
+    }
   };
 
   const handleChangePlan = async () => {
@@ -374,7 +400,9 @@ const BillingDashboardPage = () => {
       if (data.success) {
         toast.success(data.message || t('billing.planChanged'));
         setShowPlanChangeModal(false);
+        setShowDowngradePreview(false);
         setSelectedPlan(null);
+        setDowngradeCheckData(null);
         await fetchBilling();
         await fetchUsage(); // Refresh usage after plan change
       }
@@ -384,8 +412,9 @@ const BillingDashboardPage = () => {
         const errorData = err?.response?.data || err?.data || err;
         if (errorData.error === 'Downgrade not allowed' && (errorData.warnings || errorData.blockedFeatures)) {
           setDowngradeWarnings(errorData.warnings || errorData.blockedFeatures || []);
-          setDowngradeMessage(errorData.message || 'Cannot downgrade: You have features that exceed the new plan limits.');
+          setDowngradeMessage(errorData.message || 'Cannot downgrade: You have features that exceed the new plan limits. Please delete items to continue.');
           setShowPlanChangeModal(false);
+          setShowDowngradePreview(false);
           setShowDowngradeModal(true);
           setActionLoading(null);
           return;
@@ -995,6 +1024,19 @@ const BillingDashboardPage = () => {
         onConfirm={handleCancel}
         periodEnd={billing?.subscription?.currentPeriodEnd}
         isLoading={actionLoading === 'cancel'}
+      />
+
+      <DowngradePreviewModal
+        isOpen={showDowngradePreview}
+        onClose={() => {
+          setShowDowngradePreview(false);
+          setDowngradeCheckData(null);
+          setSelectedPlan(null);
+        }}
+        onConfirm={handleChangePlan}
+        checkData={downgradeCheckData!}
+        targetPlanName={selectedPlan?.name || ''}
+        isLoading={actionLoading !== null && actionLoading.startsWith('change-')}
       />
 
       <DowngradeBlockedModal

@@ -257,6 +257,60 @@ export interface ChangePlanErrorResponse {
   blockedFeatures?: DowngradeWarning[];
 }
 
+export interface DowngradeComparison {
+  feature: string;
+  currentUsage: number;
+  currentLimit: number;
+  newLimit: number;
+  overage: number;
+  needsCleanup: boolean;
+}
+
+export interface DowngradeCheckResponse {
+  success: boolean;
+  isDowngrade: boolean;
+  currentPlan: string;
+  targetPlan: string;
+  canDowngrade: boolean;
+  needsCleanup: boolean;
+  cleanupRequired: boolean;
+  message: string;
+  totalOverage: number;
+  comparison: DowngradeComparison[];
+  warnings: DowngradeWarning[];
+  featuresExceedingLimit: DowngradeComparison[];
+  featuresWithinLimit: DowngradeComparison[];
+}
+
+/**
+ * Check downgrade requirements before attempting downgrade
+ */
+export async function checkDowngrade(planType: 'personal' | 'premium' | 'ultimate'): Promise<DowngradeCheckResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/subscription/check-downgrade?planType=${planType}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to check downgrade' }));
+      throw new Error(errorData.error || 'Failed to check downgrade');
+    }
+
+    const data: DowngradeCheckResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error checking downgrade:', error);
+    throw error;
+  }
+}
+
 /**
  * Change plan (upgrade/downgrade)
  */

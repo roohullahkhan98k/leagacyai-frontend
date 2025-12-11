@@ -135,16 +135,19 @@ const DowngradeBlockedModal = ({
             ))}
           </div>
 
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-6">
+          <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 mb-6">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-800 dark:text-blue-300">
-                <p className="font-semibold mb-1">What to do next:</p>
+              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-orange-800 dark:text-orange-300">
+                <p className="font-semibold mb-2">What you need to do:</p>
                 <ol className="list-decimal list-inside space-y-1">
-                  <li>Click the links above to go to each feature</li>
-                  <li>Delete the required number of items</li>
-                  <li>Return here and try downgrading again</li>
+                  <li>Click the links above to go to each feature page</li>
+                  <li>Delete the required number of items from each feature</li>
+                  <li>Return to billing dashboard and try downgrading again</li>
                 </ol>
+                <p className="mt-2 font-medium">
+                  You cannot downgrade until you delete all items that exceed the new plan limits.
+                </p>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, Sparkles, ArrowRight, Zap, Crown, Rocket, Loader2 } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, Zap, Crown, Rocket, Loader2, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -275,8 +275,8 @@ const PricingPage = () => {
                     ))}
                   </ul>
 
-                  {/* CTA Button - Always at bottom */}
-                  <div className="mt-auto pt-4">
+                  {/* CTA Buttons - Always at bottom */}
+                  <div className="mt-auto pt-4 space-y-3">
                     <Button
                       size="lg"
                       className={`w-full text-base lg:text-lg py-3 lg:py-4 bg-gradient-to-r ${plan.gradient} hover:shadow-xl text-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
@@ -300,6 +300,19 @@ const PricingPage = () => {
                         </>
                       )}
                     </Button>
+                    
+                    {isAuthenticated && (
+                      <Link to="/billing" className="block">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full text-base lg:text-lg py-3 lg:py-4 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
+                        >
+                          <CreditCard className="h-5 w-5 mr-2" />
+                          View Billing Dashboard
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </CardContent>
               </Card>
