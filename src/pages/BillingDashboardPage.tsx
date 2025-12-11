@@ -14,7 +14,12 @@ import {
   FileText,
   ExternalLink,
   Info,
-  Clock
+  Clock,
+  Mic,
+  User,
+  Network,
+  BrainCircuit,
+  Image
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -25,8 +30,10 @@ import {
   cancelSubscription, 
   resumeSubscription,
   getPlans,
+  getUserUsage,
   type BillingDashboard,
-  type Plan
+  type Plan,
+  type UsageResponse
 } from '../services/subscriptionService';
 import { toast } from 'react-toastify';
 
@@ -269,6 +276,8 @@ const BillingDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [usage, setUsage] = useState<UsageResponse | null>(null);
+  const [loadingUsage, setLoadingUsage] = useState(false);
   
   // Modal states
   const [showPlanChangeModal, setShowPlanChangeModal] = useState(false);
@@ -285,7 +294,21 @@ const BillingDashboardPage = () => {
     window.scrollTo(0, 0);
     fetchBilling();
     fetchPlans();
+    fetchUsage();
   }, []);
+
+  const fetchUsage = async () => {
+    setLoadingUsage(true);
+    try {
+      const data = await getUserUsage();
+      setUsage(data);
+    } catch (err) {
+      console.error('Failed to fetch usage:', err);
+      setUsage(null);
+    } finally {
+      setLoadingUsage(false);
+    }
+  };
 
   const fetchBilling = async () => {
     setLoading(true);
@@ -662,6 +685,100 @@ const BillingDashboardPage = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Usage Statistics */}
+            {usage && (
+              <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                    Usage Overview - {usage.plan.toUpperCase()} Plan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {loadingUsage ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[
+                        { key: 'voice_clones', label: 'Voice Clones', icon: <Mic className="h-5 w-5" /> },
+                        { key: 'avatar_generations', label: 'Avatar Generations', icon: <User className="h-5 w-5" /> },
+                        { key: 'memory_graph_operations', label: 'Memory Nodes', icon: <Network className="h-5 w-5" /> },
+                        { key: 'interview_sessions', label: 'Interview Sessions', icon: <BrainCircuit className="h-5 w-5" /> },
+                        { key: 'multimedia_uploads', label: 'Multimedia Nodes', icon: <Image className="h-5 w-5" /> }
+                      ].map((feature) => {
+                        const stat = usage.stats[feature.key as keyof typeof usage.stats];
+                        const isLow = !stat.isUnlimited && stat.percentage >= 80;
+                        const isExhausted = !stat.isUnlimited && stat.remaining === 0;
+                        
+                        return (
+                          <div
+                            key={feature.key}
+                            className="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                          >
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                                {feature.icon}
+                              </div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                                {feature.label}
+                              </h4>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-600 dark:text-gray-400">Usage</span>
+                                <span className={`text-sm font-semibold ${
+                                  isExhausted ? 'text-red-600 dark:text-red-400' :
+                                  isLow ? 'text-orange-600 dark:text-orange-400' :
+                                  'text-gray-900 dark:text-white'
+                                }`}>
+                                  {stat.isUnlimited ? '∞ Unlimited' : `${stat.currentUsage} / ${stat.limit}`}
+                                </span>
+                              </div>
+                              {!stat.isUnlimited && (
+                                <>
+                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div
+                                      className={`h-2 rounded-full transition-all ${
+                                        isExhausted ? 'bg-red-500' :
+                                        isLow ? 'bg-orange-500' :
+                                        'bg-green-500'
+                                      }`}
+                                      style={{ width: `${Math.min(stat.percentage, 100)}%` }}
+                                    />
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className={`text-xs font-medium ${
+                                      isExhausted ? 'text-red-600 dark:text-red-400' :
+                                      isLow ? 'text-orange-600 dark:text-orange-400' :
+                                      'text-gray-600 dark:text-gray-400'
+                                    }`}>
+                                      {stat.remaining > 0 ? `${stat.remaining} remaining` : 'Limit reached'}
+                                    </span>
+                                    {isExhausted && (
+                                      <Link to="/pricing" className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                                        Upgrade
+                                      </Link>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                              {stat.isUnlimited && (
+                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  Unlimited access
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Payment Method */}
             {billing.paymentMethod && (

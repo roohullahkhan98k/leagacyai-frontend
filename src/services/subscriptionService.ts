@@ -100,6 +100,29 @@ export interface ChangePlanResponse {
   error?: string;
 }
 
+export interface FeatureUsage {
+  limit: number;
+  currentUsage: number;
+  remaining: number;
+  isUnlimited: boolean;
+  percentage: number;
+}
+
+export interface UsageStats {
+  voice_clones: FeatureUsage;
+  avatar_generations: FeatureUsage;
+  memory_graph_operations: FeatureUsage;
+  interview_sessions: FeatureUsage;
+  multimedia_uploads: FeatureUsage;
+}
+
+export interface UsageResponse {
+  success: boolean;
+  plan: 'free' | 'personal' | 'premium' | 'ultimate';
+  stats: UsageStats;
+  error?: string;
+}
+
 /**
  * Fetch available subscription plans
  */
@@ -306,6 +329,35 @@ export async function resumeSubscription(): Promise<{ success: boolean; message?
     return data;
   } catch (error) {
     console.error('Resume subscription error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get user's usage statistics for all features
+ */
+export async function getUserUsage(): Promise<UsageResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/subscription/usage`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to fetch usage' }));
+      throw new Error(errorData.error || 'Failed to fetch usage');
+    }
+
+    const data: UsageResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching usage:', error);
     throw error;
   }
 }

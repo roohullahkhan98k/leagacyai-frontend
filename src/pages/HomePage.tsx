@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2, CreditCard } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2, CreditCard, LayoutDashboard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card, { CardContent } from '../components/ui/Card';
+import { useAuth } from '../contexts/AuthContext';
+import { getSubscriptionStatus, getUserUsage, type UsageResponse } from '../services/subscriptionService';
 
 const HomePage = () => {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [loadingSubscription, setLoadingSubscription] = useState(true);
+  const [usage, setUsage] = useState<UsageResponse | null>(null);
+  const [loadingUsage, setLoadingUsage] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -19,6 +26,49 @@ const HomePage = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (isAuthenticated) {
+        setLoadingSubscription(true);
+        try {
+          const status = await getSubscriptionStatus();
+          setHasSubscription(status.hasActiveSubscription);
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          setHasSubscription(false);
+        } finally {
+          setLoadingSubscription(false);
+        }
+      } else {
+        setHasSubscription(false);
+        setLoadingSubscription(false);
+      }
+    };
+
+    checkSubscription();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const fetchUsage = async () => {
+      if (isAuthenticated) {
+        setLoadingUsage(true);
+        try {
+          const usageData = await getUserUsage();
+          setUsage(usageData);
+        } catch (error) {
+          console.error('Error fetching usage:', error);
+          setUsage(null);
+        } finally {
+          setLoadingUsage(false);
+        }
+      } else {
+        setUsage(null);
+      }
+    };
+
+    fetchUsage();
+  }, [isAuthenticated]);
+
   const features = [
     {
       icon: <BrainCircuit className="h-10 w-10" />,
@@ -26,7 +76,8 @@ const HomePage = () => {
       description: t('home.aiInterviewDescription'),
       gradient: 'from-blue-500 to-cyan-500',
       bgGradient: 'from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20',
-      link: '/interview'
+      link: '/interview',
+      usageKey: 'interview_sessions' as keyof UsageResponse['stats']
     },
     {
       icon: <Network className="h-10 w-10" />,
@@ -34,7 +85,8 @@ const HomePage = () => {
       description: t('home.memoryGraphDescription'),
       gradient: 'from-purple-500 to-pink-500',
       bgGradient: 'from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20',
-      link: '/memory-graph'
+      link: '/memory-graph',
+      usageKey: 'memory_graph_operations' as keyof UsageResponse['stats']
     },
     {
       icon: <Mic className="h-10 w-10" />,
@@ -42,7 +94,8 @@ const HomePage = () => {
       description: t('home.voiceCloningDescription'),
       gradient: 'from-orange-500 to-red-500',
       bgGradient: 'from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20',
-      link: '/voice-cloning'
+      link: '/voice-cloning',
+      usageKey: 'voice_clones' as keyof UsageResponse['stats']
     },
     {
       icon: <User className="h-10 w-10" />,
@@ -50,7 +103,8 @@ const HomePage = () => {
       description: t('home.avatarServiceDescription'),
       gradient: 'from-green-500 to-emerald-500',
       bgGradient: 'from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20',
-      link: '/avatar-service'
+      link: '/avatar-service',
+      usageKey: 'avatar_generations' as keyof UsageResponse['stats']
     },
     {
       icon: <Image className="h-10 w-10" />,
@@ -58,7 +112,8 @@ const HomePage = () => {
       description: t('home.multimediaDescription'),
       gradient: 'from-indigo-500 to-violet-500',
       bgGradient: 'from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20',
-      link: '/multimedia'
+      link: '/multimedia',
+      usageKey: 'multimedia_uploads' as keyof UsageResponse['stats']
     }
   ];
 
@@ -142,15 +197,27 @@ const HomePage = () => {
               {t('home.getStarted')}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
-            <Link to="/pricing">
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
-              >
-                <CreditCard className="h-5 w-5 mr-2" />
-                View Pricing
-              </Button>
-            </Link>
+            {hasSubscription ? (
+              <Link to="/billing">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <LayoutDashboard className="h-5 w-5 mr-2" />
+                  Billing Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/pricing">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  View Pricing
+                </Button>
+              </Link>
+            )}
             <Button 
               size="lg" 
               variant="outline"
@@ -279,9 +346,55 @@ const HomePage = () => {
                       <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 dark:group-hover:from-white dark:group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                      <p className="text-gray-600 dark:text-gray-400 mb-4 flex-grow leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
                         {feature.description}
                       </p>
+                      
+                      {/* Usage Display */}
+                      {isAuthenticated && usage && usage.stats[feature.usageKey] && (() => {
+                        const stat = usage.stats[feature.usageKey];
+                        const isLow = !stat.isUnlimited && stat.percentage >= 80;
+                        const isExhausted = !stat.isUnlimited && stat.remaining === 0;
+                        
+                        return (
+                          <div className="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Usage</span>
+                              <span className={`text-xs font-semibold ${
+                                isExhausted ? 'text-red-600 dark:text-red-400' :
+                                isLow ? 'text-orange-600 dark:text-orange-400' :
+                                'text-gray-600 dark:text-gray-400'
+                              }`}>
+                                {stat.isUnlimited ? 'Unlimited' : `${stat.currentUsage} / ${stat.limit}`}
+                              </span>
+                            </div>
+                            {!stat.isUnlimited && (
+                              <>
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-1">
+                                  <div 
+                                    className={`h-2 rounded-full transition-all duration-300 ${
+                                      isExhausted ? 'bg-red-500' :
+                                      isLow ? 'bg-orange-500' :
+                                      'bg-green-500'
+                                    }`}
+                                    style={{ width: `${Math.min(stat.percentage, 100)}%` }}
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-gray-500 dark:text-gray-500">
+                                    {stat.remaining > 0 ? `${stat.remaining} remaining` : 'Limit reached'}
+                                  </span>
+                                  {isExhausted && (
+                                    <Link to="/pricing" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                                      Upgrade
+                                    </Link>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })()}
                       
                       <div className={`flex items-center ${colors.text} font-medium group-hover:translate-x-2 transition-all duration-300`}>
                         {t('home.learnMore')}
@@ -360,15 +473,27 @@ const HomePage = () => {
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </Link>
-            <Link to="/pricing">
-              <Button 
-                size="lg" 
-                className="text-lg px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
-              >
-                <CreditCard className="h-5 w-5 mr-2" />
-                {t('home.viewPricing')}
-              </Button>
-            </Link>
+            {hasSubscription ? (
+              <Link to="/billing">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <LayoutDashboard className="h-5 w-5 mr-2" />
+                  Billing Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/pricing">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  {t('home.viewPricing')}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
