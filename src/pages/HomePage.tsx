@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BrainCircuit, Network, Mic, User, Image, Users, Zap, Shield, Globe, Sparkles, TrendingUp, CheckCircle2, CreditCard, LayoutDashboard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -9,11 +10,19 @@ import { getSubscriptionStatus, getUserUsage, type UsageResponse } from '../serv
 
 const HomePage = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [usage, setUsage] = useState<UsageResponse | null>(null);
+
+  // Redirect admin users to admin panel
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'admin') {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     setIsVisible(true);
@@ -350,9 +359,16 @@ const HomePage = () => {
                                 <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
                                   Subscribe to unlock
                                 </span>
-                                <Link to="/pricing" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    navigate('/pricing');
+                                  }}
+                                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                                >
                                   View Plans
-                                </Link>
+                                </button>
                               </div>
                             </div>
                           );
@@ -430,12 +446,16 @@ const HomePage = () => {
                                 </div>
                               )}
                               {isExhausted && (
-                                <Link 
-                                  to="/pricing" 
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    navigate('/pricing');
+                                  }}
                                   className="block w-full text-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors pt-1"
                                 >
                                   Upgrade Plan →
-                                </Link>
+                                </button>
                               )}
                             </div>
                           </div>

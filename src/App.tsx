@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { createContext, useContext, useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,13 +11,15 @@ import PricingPage from './pages/PricingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
 import BillingDashboardPage from './pages/BillingDashboardPage';
+import AdminPage from './pages/AdminPage';
 import InterviewPage from './features/ai-interview';
 import MemoryGraphPage from './features/memory-graph';
 import VoiceCloningPage from './features/voice-cloning';
 import AvatarServicePage from './features/avatar-service';
 import MultimediaPage from './features/multimedia';
 import NotFoundPage from './pages/NotFoundPage';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
+import NormalUserRoute from './components/auth/NormalUserRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
@@ -45,6 +47,13 @@ function AppContent() {
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const location = useLocation();
   const { i18n } = useTranslation();
+  const { registerServiceWorker } = usePWA();
+
+  // Register service worker on app load
+  useEffect(() => {
+    registerServiceWorker();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Hide header on login, register, and payment pages
   const shouldShowHeader = !isInterviewActive && 
@@ -80,53 +89,63 @@ function AppContent() {
             <Route path="/subscription/success" element={<PaymentSuccessPage />} />
             <Route path="/subscription/cancel" element={<PaymentCancelPage />} />
             
-            {/* Protected routes */}
+            {/* Admin routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              }
+            />
+            
+            {/* Protected routes - Normal users only */}
             <Route 
               path="/billing" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <BillingDashboardPage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             <Route 
               path="/interview" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <InterviewPage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             <Route 
               path="/memory-graph" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <MemoryGraphPage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             <Route 
               path="/voice-cloning" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <VoiceCloningPage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             <Route 
               path="/avatar-service" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <AvatarServicePage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             <Route 
               path="/multimedia" 
               element={
-                <ProtectedRoute>
+                <NormalUserRoute>
                   <MultimediaPage />
-                </ProtectedRoute>
+                </NormalUserRoute>
               } 
             />
             
@@ -158,14 +177,6 @@ function ToastContainerWrapper() {
 }
 
 function App() {
-  const { registerServiceWorker } = usePWA();
-
-  // Register service worker on app load
-  useEffect(() => {
-    registerServiceWorker();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <AuthProvider>
       <ToastProvider>
