@@ -476,7 +476,27 @@ export async function createNode(payload: CreateNodeRequest): Promise<CreateNode
     headers: getAuthHeadersWithJSON(),
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
+  
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: res.statusText }));
+    
+    // Handle subscription/limit errors
+    if (res.status === 403) {
+      const errorWithResponse = {
+        response: { status: 403, data: error },
+        status: 403,
+        data: error
+      };
+      
+      const { handleFeatureError } = await import('../utils/featureErrorHandler');
+      if (handleFeatureError(errorWithResponse, 'multimedia uploads')) {
+        throw new Error('SUBSCRIPTION_OR_LIMIT_ERROR');
+      }
+    }
+    
+    throw error;
+  }
+  
   return res.json();
 }
 

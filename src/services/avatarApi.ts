@@ -216,6 +216,21 @@ export async function startImageToModel(imageFile: File): Promise<StartPipelineR
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: res.statusText }));
+    
+    // Handle subscription/limit errors
+    if (res.status === 403) {
+      const errorWithResponse = {
+        response: { status: 403, data: error },
+        status: 403,
+        data: error
+      };
+      
+      const { handleFeatureError } = await import('../utils/featureErrorHandler');
+      if (handleFeatureError(errorWithResponse, 'avatar generation')) {
+        throw new Error('SUBSCRIPTION_OR_LIMIT_ERROR');
+      }
+    }
+    
     throw new Error(error.error || 'Failed to start image-to-model pipeline');
   }
 

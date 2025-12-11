@@ -89,7 +89,7 @@ export interface DeleteInterviewResponse {
 }
 
 class InterviewApi {
-  private async fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+  private async fetchWithAuth(endpoint: string, options: RequestInit = {}): Promise<any> {
     const token = authService.getToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -107,7 +107,16 @@ class InterviewApi {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      
+      // Create error object with response structure for error handler
+      const errorWithResponse = {
+        response: { status: response.status, data: error },
+        status: response.status,
+        data: error,
+        message: error.message || `HTTP error! status: ${response.status}`
+      };
+      
+      throw errorWithResponse;
     }
 
     return response.json();
@@ -117,13 +126,28 @@ class InterviewApi {
    * Start a new interview session
    */
   async startInterview(sessionId: string, userId?: string): Promise<StartInterviewResponse> {
-    return this.fetchWithAuth('/api/interview/start', {
-      method: 'POST',
-      body: JSON.stringify({
-        session_id: sessionId,
-        user_id: userId,
-      }),
-    });
+    try {
+      return await this.fetchWithAuth('/api/interview/start', {
+        method: 'POST',
+        body: JSON.stringify({
+          session_id: sessionId,
+          user_id: userId,
+        }),
+      });
+    } catch (error: any) {
+      // Handle subscription/limit errors
+      if (error?.response?.status === 403 || error?.status === 403) {
+        const { handleFeatureError } = await import('../utils/featureErrorHandler');
+        if (handleFeatureError(error, 'interview sessions')) {
+          throw new Error('SUBSCRIPTION_OR_LIMIT_ERROR');
+        }
+      }
+      // Re-throw as regular error if not handled
+      if (error?.message) {
+        throw new Error(error.message);
+      }
+      throw error;
+    }
   }
 
   /**

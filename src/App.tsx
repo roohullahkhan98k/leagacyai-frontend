@@ -22,6 +22,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
 import { OfflineIndicator } from './components/ui/OfflineIndicator';
+import FeatureErrorHandler from './components/FeatureErrorHandler';
 import { usePWA } from './hooks/usePWA';
 
 // Create context for interview state
@@ -66,6 +67,7 @@ function AppContent() {
 
   return (
     <InterviewContext.Provider value={{ isInterviewActive, setIsInterviewActive }}>
+      <FeatureErrorHandler />
       <div className="min-h-screen flex flex-col">
         {shouldShowHeader && <Header />}
         <main className="flex-1">

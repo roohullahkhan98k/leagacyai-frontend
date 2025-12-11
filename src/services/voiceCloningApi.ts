@@ -158,7 +158,28 @@ export async function cloneVoice(payload: CloneVoiceRequest): Promise<CloneVoice
     headers: getAuthHeaders(),
     body: formData,
   });
-  if (!res.ok) throw await res.json().catch(() => new Error(res.statusText));
+  
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: res.statusText }));
+    
+    // Handle subscription/limit errors
+    if (res.status === 403) {
+      const errorWithResponse = {
+        response: { status: 403, data: error },
+        status: 403,
+        data: error
+      };
+      
+      // Import and use error handler
+      const { handleFeatureError } = await import('../utils/featureErrorHandler');
+      if (handleFeatureError(errorWithResponse, 'voice cloning')) {
+        throw new Error('SUBSCRIPTION_OR_LIMIT_ERROR');
+      }
+    }
+    
+    throw error;
+  }
+  
   return res.json();
 }
 
