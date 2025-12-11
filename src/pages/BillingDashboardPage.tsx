@@ -9,11 +9,12 @@ import {
   X, 
   RefreshCcw, 
   Loader2,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Info,
+  Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -29,6 +30,238 @@ import {
 } from '../services/subscriptionService';
 import { toast } from 'react-toastify';
 
+// Plan Change Modal Component
+interface PlanChangeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  currentPlan: string;
+  newPlan: string;
+  planName: string;
+  planPrice: number;
+  isUpgrade: boolean;
+  isDowngrade: boolean;
+  isLoading: boolean;
+}
+
+const PlanChangeModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  currentPlan,
+  newPlan,
+  planName,
+  planPrice,
+  isUpgrade,
+  isDowngrade,
+  isLoading
+}: PlanChangeModalProps) => {
+  if (!isOpen) return null;
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+      <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700">
+        <div className="p-6">
+          {!isLoading && (
+            <button
+              onClick={handleClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
+
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              {isUpgrade ? (
+                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                  <ArrowUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+              ) : isDowngrade ? (
+                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                  <ArrowDown className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                </div>
+              ) : (
+                <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                  <ArrowDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                </div>
+              )}
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {isUpgrade ? 'Upgrade Plan' : isDowngrade ? 'Downgrade Plan' : 'Change Plan'}
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Current Plan</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">{currentPlan}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">New Plan</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">{newPlan}</span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-800 dark:text-blue-300">
+                    {isUpgrade ? (
+                      <>
+                        <p className="font-medium mb-1">Your plan will be upgraded immediately</p>
+                        <p>You'll be charged A${planPrice}/month. The change takes effect right away, and you'll be billed the prorated amount.</p>
+                      </>
+                    ) : isDowngrade ? (
+                      <>
+                        <p className="font-medium mb-1">Your plan will change at the end of the billing period</p>
+                        <p>You'll continue with your current plan until the end of your billing period. After that, you'll be moved to the {planName} plan.</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium mb-1">Your plan will change at the end of the billing period</p>
+                        <p>You'll continue with your current plan until the end of your billing period. After that, you'll be moved to the {planName} plan.</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onConfirm}
+              isLoading={isLoading}
+            >
+              {isUpgrade ? 'Upgrade Now' : isDowngrade ? 'Confirm Downgrade' : 'Confirm Change'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Cancel Subscription Modal
+interface CancelModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  periodEnd: string | null | undefined;
+  isLoading: boolean;
+}
+
+const CancelModal = ({ isOpen, onClose, onConfirm, periodEnd, isLoading }: CancelModalProps) => {
+  if (!isOpen) return null;
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getTime() === 0) return 'N/A';
+    return date.toLocaleDateString('en-AU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+      <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700">
+        <div className="p-6">
+          {!isLoading && (
+            <button
+              onClick={handleClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
+
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Cancel Subscription
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-gray-600 dark:text-gray-400">
+                Are you sure you want to cancel your subscription?
+              </p>
+
+              <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="flex items-start gap-3">
+                  <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-orange-800 dark:text-orange-300">
+                    <p className="font-medium mb-1">Scheduled Cancellation</p>
+                    <p>Your subscription will remain active until the end of your current billing period.</p>
+                    {periodEnd && (
+                      <p className="mt-2 font-semibold">
+                        Access until: {formatDate(periodEnd)}
+                      </p>
+                    )}
+                    <p className="mt-2">You can resume your subscription at any time before this date to continue without interruption.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              Keep Subscription
+            </Button>
+            <Button
+              variant="danger"
+              onClick={onConfirm}
+              isLoading={isLoading}
+            >
+              Schedule Cancellation
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BillingDashboardPage = () => {
   const { t } = useTranslation();
   const [billing, setBilling] = useState<BillingDashboard | null>(null);
@@ -36,10 +269,19 @@ const BillingDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  
+  // Modal states
+  const [showPlanChangeModal, setShowPlanChangeModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    key: 'personal' | 'premium' | 'ultimate';
+    name: string;
+    price: number;
+    isUpgrade: boolean;
+    isDowngrade: boolean;
+  } | null>(null);
 
   useEffect(() => {
-    setIsVisible(true);
     window.scrollTo(0, 0);
     fetchBilling();
     fetchPlans();
@@ -70,23 +312,42 @@ const BillingDashboardPage = () => {
     }
   };
 
-  const handleChangePlan = async (newPlan: 'personal' | 'premium' | 'ultimate') => {
-    if (!billing?.subscription) return;
+  const handlePlanChangeClick = (planKey: 'personal' | 'premium' | 'ultimate') => {
+    if (!billing?.subscription || !plans) return;
     
-    if (billing.subscription.plan === newPlan) {
+    if (billing.subscription.plan === planKey) {
       toast.info(t('billing.alreadyOnPlan'));
       return;
     }
 
-    if (!confirm(t('billing.confirmChangePlan'))) {
-      return;
-    }
+    const plan = plans[planKey];
+    const isUpgrade = 
+      (billing.subscription.plan === 'personal' && (planKey === 'premium' || planKey === 'ultimate')) ||
+      (billing.subscription.plan === 'premium' && planKey === 'ultimate');
+    const isDowngrade = 
+      (billing.subscription.plan === 'ultimate' && (planKey === 'premium' || planKey === 'personal')) ||
+      (billing.subscription.plan === 'premium' && planKey === 'personal');
 
-    setActionLoading(`change-${newPlan}`);
+    setSelectedPlan({
+      key: planKey,
+      name: plan.name,
+      price: plan.price,
+      isUpgrade,
+      isDowngrade
+    });
+    setShowPlanChangeModal(true);
+  };
+
+  const handleChangePlan = async () => {
+    if (!selectedPlan || !billing?.subscription) return;
+
+    setActionLoading(`change-${selectedPlan.key}`);
     try {
-      const data = await changePlan(newPlan);
+      const data = await changePlan(selectedPlan.key);
       if (data.success) {
         toast.success(data.message || t('billing.planChanged'));
+        setShowPlanChangeModal(false);
+        setSelectedPlan(null);
         await fetchBilling();
       }
     } catch (err: any) {
@@ -97,15 +358,12 @@ const BillingDashboardPage = () => {
   };
 
   const handleCancel = async () => {
-    if (!confirm(t('billing.confirmCancel'))) {
-      return;
-    }
-
     setActionLoading('cancel');
     try {
       const data = await cancelSubscription();
       if (data.success) {
         toast.success(data.message || t('billing.cancelSuccess'));
+        setShowCancelModal(false);
         await fetchBilling();
       }
     } catch (err: any) {
@@ -137,8 +395,15 @@ const BillingDashboardPage = () => {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-AU', {
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) {
+      return 'N/A';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getTime() === 0) {
+      return 'N/A';
+    }
+    return date.toLocaleDateString('en-AU', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -147,9 +412,9 @@ const BillingDashboardPage = () => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center">
+      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">{t('billing.loading')}</p>
         </div>
       </div>
@@ -158,11 +423,11 @@ const BillingDashboardPage = () => {
 
   if (error && !billing) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Card className="max-w-md border border-gray-200 dark:border-gray-700">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{t('billing.error')}</h2>
+            <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">{t('billing.error')}</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
             <Button onClick={fetchBilling}>
               <RefreshCcw className="h-4 w-4 mr-2" />
@@ -175,29 +440,18 @@ const BillingDashboardPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen overflow-hidden">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 overflow-hidden -z-10">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
-
-      {/* Header Section */}
-      <div className="relative w-full max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/50">
-                <CreditCard className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  {t('billing.title')}
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">
-                  {t('billing.subtitle')}
-                </p>
-              </div>
+    <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+                {t('billing.title')}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                {t('billing.subtitle')}
+              </p>
             </div>
             <Button
               variant="outline"
@@ -210,50 +464,44 @@ const BillingDashboardPage = () => {
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="relative w-full max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {!billing?.hasSubscription ? (
-          <Card className="border-2 border-gray-200/50 dark:border-gray-700/50">
+          <Card className="border border-gray-200 dark:border-gray-700">
             <CardContent className="p-12 text-center">
-              <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 {t('billing.noSubscription')}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-8">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {t('billing.noSubscriptionDescription')}
               </p>
               <Link to="/pricing">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                >
+                <Button variant="primary">
                   {t('billing.viewPlans')}
                 </Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Current Subscription */}
-            <Card className="border-2 border-blue-500/50 dark:border-blue-500/50 shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-3">
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  {t('billing.currentPlan')}
+            <Card className="border border-gray-200 dark:border-gray-700">
+              <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Current Subscription
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-6">
                 {billing.subscription && (
-                  <>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="space-y-6">
+                    {/* Plan Info */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
                       <div>
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent capitalize">
+                          <span className="text-2xl font-semibold text-gray-900 dark:text-white capitalize">
                             {billing.subscription.plan}
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          <span className={`px-2.5 py-1 rounded-md text-xs font-medium ${
                             billing.subscription.status === 'active' 
                               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                               : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
@@ -262,24 +510,36 @@ const BillingDashboardPage = () => {
                           </span>
                         </div>
                         {billing.subscription.cancelAtPeriodEnd && (
-                          <div className="flex items-center gap-2 mt-2 text-orange-600 dark:text-orange-400">
-                            <AlertCircle className="h-4 w-4" />
-                            <span className="text-sm">{t('billing.willCancelAtPeriodEnd')}</span>
+                          <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                            <div className="flex items-start gap-2">
+                              <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                              <div className="text-sm text-orange-800 dark:text-orange-300">
+                                <p className="font-medium">Scheduled for cancellation</p>
+                                <p className="mt-1">
+                                  Your subscription will be automatically canceled at the end of your billing period.
+                                  {billing.subscription.currentPeriodEnd && (
+                                    <> You can resume it anytime before <span className="font-semibold">{formatDate(billing.subscription.currentPeriodEnd)}</span>.</>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('billing.currentPeriod')}</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {formatDate(billing.subscription.currentPeriodStart)} - {formatDate(billing.subscription.currentPeriodEnd)}
+                      <div className="text-left sm:text-right">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Billing Period</p>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">
+                          {billing.subscription.currentPeriodStart && billing.subscription.currentPeriodEnd
+                            ? `${formatDate(billing.subscription.currentPeriodStart)} - ${formatDate(billing.subscription.currentPeriodEnd)}`
+                            : 'N/A'}
                         </p>
                       </div>
                     </div>
 
                     {/* Plan Actions */}
-                    <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                        {t('billing.changePlan')}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                        Change Plan
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {plans && Object.entries(plans).map(([key, plan]) => {
@@ -293,52 +553,49 @@ const BillingDashboardPage = () => {
                             (billing.subscription?.plan === 'premium' && planKey === 'personal');
 
                           return (
-                            <Card
+                            <div
                               key={planKey}
-                              className={`border-2 transition-all ${
+                              className={`p-4 rounded-lg border transition-all ${
                                 isCurrentPlan
-                                  ? 'border-blue-500/50 dark:border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20'
-                                  : 'border-gray-200/50 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                               }`}
                             >
-                              <CardContent className="p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                  <h4 className="font-semibold text-gray-900 dark:text-white capitalize">
-                                    {plan.name}
-                                  </h4>
-                                  {isCurrentPlan && (
-                                    <CheckCircle2 className="h-5 w-5 text-blue-500" />
-                                  )}
-                                </div>
-                                <p className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                                  A${plan.price}
-                                  <span className="text-sm font-normal text-gray-600 dark:text-gray-400">/mo</span>
-                                </p>
-                                <Button
-                                  size="sm"
-                                  variant={isCurrentPlan ? 'outline' : 'primary'}
-                                  className="w-full"
-                                  onClick={() => handleChangePlan(planKey)}
-                                  disabled={isCurrentPlan || actionLoading !== null}
-                                >
-                                  {actionLoading === `change-${planKey}` ? (
-                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                  ) : isUpgrade ? (
-                                    <ArrowUp className="h-4 w-4 mr-2" />
-                                  ) : isDowngrade ? (
-                                    <ArrowDown className="h-4 w-4 mr-2" />
-                                  ) : null}
-                                  {isCurrentPlan 
-                                    ? t('billing.currentPlan')
-                                    : isUpgrade 
-                                    ? t('billing.upgrade')
-                                    : isDowngrade
-                                    ? t('billing.downgrade')
-                                    : t('billing.switch')
-                                  }
-                                </Button>
-                              </CardContent>
-                            </Card>
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="font-medium text-gray-900 dark:text-white capitalize">
+                                  {plan.name}
+                                </h4>
+                                {isCurrentPlan && (
+                                  <CheckCircle2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                )}
+                              </div>
+                              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                                A${plan.price}
+                                <span className="text-sm font-normal text-gray-600 dark:text-gray-400">/mo</span>
+                              </p>
+                              <Button
+                                size="sm"
+                                variant={isCurrentPlan ? 'outline' : 'primary'}
+                                className="w-full"
+                                onClick={() => handlePlanChangeClick(planKey)}
+                                disabled={isCurrentPlan || actionLoading !== null}
+                              >
+                                {actionLoading === `change-${planKey}` ? (
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                ) : isUpgrade ? (
+                                  <ArrowUp className="h-4 w-4 mr-2" />
+                                ) : isDowngrade ? (
+                                  <ArrowDown className="h-4 w-4 mr-2" />
+                                ) : null}
+                                {isCurrentPlan 
+                                  ? 'Current Plan'
+                                  : isUpgrade 
+                                  ? 'Upgrade'
+                                  : isDowngrade
+                                  ? 'Downgrade'
+                                  : 'Switch'}
+                              </Button>
+                            </div>
                           );
                         })}
                       </div>
@@ -347,62 +604,68 @@ const BillingDashboardPage = () => {
                     {/* Cancel/Resume Actions */}
                     <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                       {billing.subscription.cancelAtPeriodEnd ? (
-                        <Button
-                          variant="outline"
-                          className="bg-green-50 dark:bg-green-900/20 border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
-                          onClick={handleResume}
-                          disabled={actionLoading !== null}
-                        >
-                          {actionLoading === 'resume' ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : (
-                            <RefreshCcw className="h-4 w-4 mr-2" />
-                          )}
-                          {t('billing.resumeSubscription')}
-                        </Button>
+                        <div className="space-y-3">
+                          <Button
+                            variant="primary"
+                            onClick={handleResume}
+                            disabled={actionLoading !== null}
+                            className="w-full sm:w-auto"
+                          >
+                            {actionLoading === 'resume' ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : (
+                              <RefreshCcw className="h-4 w-4 mr-2" />
+                            )}
+                            Resume Subscription
+                          </Button>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Resuming will cancel the scheduled cancellation and keep your subscription active.
+                          </p>
+                        </div>
                       ) : (
-                        <Button
-                          variant="outline"
-                          className="border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          onClick={handleCancel}
-                          disabled={actionLoading !== null}
-                        >
-                          {actionLoading === 'cancel' ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : (
+                        <div className="space-y-3">
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowCancelModal(true)}
+                            disabled={actionLoading !== null}
+                            className="w-full sm:w-auto border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
                             <X className="h-4 w-4 mr-2" />
-                          )}
-                          {t('billing.cancelSubscription')}
-                        </Button>
+                            Cancel Subscription
+                          </Button>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Your subscription will remain active until the end of your billing period. You can resume anytime before then.
+                          </p>
+                        </div>
                       )}
                     </div>
-                  </>
+                  </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Payment Method */}
             {billing.paymentMethod && (
-              <Card className="border-2 border-gray-200/50 dark:border-gray-700/50">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-blue-500" />
-                    {t('billing.paymentMethod')}
+              <Card className="border border-gray-200 dark:border-gray-700">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    Payment Method
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   {billing.paymentMethod.card && (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-                          <CreditCard className="h-6 w-6" />
+                        <div className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
+                          <CreditCard className="h-6 w-6 text-gray-600 dark:text-gray-400" />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">
+                          <p className="font-medium text-gray-900 dark:text-white">
                             {billing.paymentMethod.card.brand.toUpperCase()} ****{billing.paymentMethod.card.last4}
                           </p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {t('billing.expires')}: {billing.paymentMethod.card.expMonth}/{billing.paymentMethod.card.expYear}
+                            Expires {billing.paymentMethod.card.expMonth}/{billing.paymentMethod.card.expYear}
                           </p>
                         </div>
                       </div>
@@ -414,25 +677,32 @@ const BillingDashboardPage = () => {
 
             {/* Upcoming Invoice */}
             {billing.upcomingInvoice && (
-              <Card className="border-2 border-gray-200/50 dark:border-gray-700/50">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-green-500" />
-                    {t('billing.upcomingInvoice')}
+              <Card className="border border-gray-200 dark:border-gray-700">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    Upcoming Invoice
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Amount</span>
+                      <span className="text-xl font-semibold text-gray-900 dark:text-white">
                         {formatCurrency(billing.upcomingInvoice.amount, billing.upcomingInvoice.currency)}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('billing.nextPayment')}: {formatDate(billing.upcomingInvoice.nextPaymentAttempt)}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('billing.period')}: {formatDate(billing.upcomingInvoice.periodStart)} - {formatDate(billing.upcomingInvoice.periodEnd)}
-                      </p>
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Next Payment</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {formatDate(billing.upcomingInvoice.nextPaymentAttempt)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Period</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {formatDate(billing.upcomingInvoice.periodStart)} - {formatDate(billing.upcomingInvoice.periodEnd)}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -441,23 +711,23 @@ const BillingDashboardPage = () => {
 
             {/* Invoice History */}
             {billing.invoices && billing.invoices.length > 0 && (
-              <Card className="border-2 border-gray-200/50 dark:border-gray-700/50">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-purple-500" />
-                    {t('billing.invoiceHistory')}
+              <Card className="border border-gray-200 dark:border-gray-700">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    Invoice History
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-6">
+                  <div className="space-y-3">
                     {billing.invoices.map((invoice) => (
                       <div
                         key={invoice.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50"
+                        className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <p className="font-semibold text-gray-900 dark:text-white">
+                            <p className="font-medium text-gray-900 dark:text-white">
                               {invoice.number}
                             </p>
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -481,7 +751,7 @@ const BillingDashboardPage = () => {
                               href={invoice.hostedInvoiceUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                               title={t('billing.viewInvoice')}
                             >
                               <ExternalLink className="h-4 w-4" />
@@ -492,7 +762,7 @@ const BillingDashboardPage = () => {
                               href={invoice.invoicePdf}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                               title={t('billing.downloadPDF')}
                             >
                               <Download className="h-4 w-4" />
@@ -508,9 +778,35 @@ const BillingDashboardPage = () => {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {selectedPlan && (
+        <PlanChangeModal
+          isOpen={showPlanChangeModal}
+          onClose={() => {
+            setShowPlanChangeModal(false);
+            setSelectedPlan(null);
+          }}
+          onConfirm={handleChangePlan}
+          currentPlan={billing?.subscription?.plan || ''}
+          newPlan={selectedPlan.key}
+          planName={selectedPlan.name}
+          planPrice={selectedPlan.price}
+          isUpgrade={selectedPlan.isUpgrade}
+          isDowngrade={selectedPlan.isDowngrade}
+          isLoading={actionLoading !== null}
+        />
+      )}
+
+      <CancelModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancel}
+        periodEnd={billing?.subscription?.currentPeriodEnd}
+        isLoading={actionLoading === 'cancel'}
+      />
     </div>
   );
 };
 
 export default BillingDashboardPage;
-
