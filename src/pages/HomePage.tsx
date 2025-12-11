@@ -13,9 +13,7 @@ const HomePage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
-  const [loadingSubscription, setLoadingSubscription] = useState(true);
   const [usage, setUsage] = useState<UsageResponse | null>(null);
-  const [loadingUsage, setLoadingUsage] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -29,19 +27,15 @@ const HomePage = () => {
   useEffect(() => {
     const checkSubscription = async () => {
       if (isAuthenticated) {
-        setLoadingSubscription(true);
         try {
           const status = await getSubscriptionStatus();
           setHasSubscription(status.hasActiveSubscription);
         } catch (error) {
           console.error('Error checking subscription:', error);
           setHasSubscription(false);
-        } finally {
-          setLoadingSubscription(false);
         }
       } else {
         setHasSubscription(false);
-        setLoadingSubscription(false);
       }
     };
 
@@ -51,15 +45,12 @@ const HomePage = () => {
   useEffect(() => {
     const fetchUsage = async () => {
       if (isAuthenticated) {
-        setLoadingUsage(true);
         try {
           const usageData = await getUserUsage();
           setUsage(usageData);
         } catch (error) {
           console.error('Error fetching usage:', error);
           setUsage(null);
-        } finally {
-          setLoadingUsage(false);
         }
       } else {
         setUsage(null);
@@ -351,26 +342,83 @@ const HomePage = () => {
                       </p>
                       
                       {/* Usage Display */}
-                      {isAuthenticated && usage && usage.stats[feature.usageKey] && (() => {
+                      {(() => {
+                        if (!isAuthenticated) {
+                          return (
+                            <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                                  Subscribe to unlock
+                                </span>
+                                <Link to="/pricing" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                                  View Plans
+                                </Link>
+                              </div>
+                            </div>
+                          );
+                        }
+                        
+                        if (!usage || !usage.stats[feature.usageKey]) {
+                          return null;
+                        }
+                        
                         const stat = usage.stats[feature.usageKey];
                         const isLow = !stat.isUnlimited && stat.percentage >= 80;
                         const isExhausted = !stat.isUnlimited && stat.remaining === 0;
                         
                         return (
-                          <div className="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Usage</span>
-                              <span className={`text-xs font-semibold ${
-                                isExhausted ? 'text-red-600 dark:text-red-400' :
-                                isLow ? 'text-orange-600 dark:text-orange-400' :
-                                'text-gray-600 dark:text-gray-400'
-                              }`}>
-                                {stat.isUnlimited ? 'Unlimited' : `${stat.currentUsage} / ${stat.limit}`}
-                              </span>
+                          <div className={`mb-4 p-4 rounded-lg border-2 ${
+                            isExhausted 
+                              ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700' 
+                              : isLow
+                              ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700'
+                              : 'bg-gray-50 dark:bg-gray-900/50 border-gray-300 dark:border-gray-600'
+                          }`}>
+                            {/* Remaining Count - Most Prominent */}
+                            <div className="text-center mb-3">
+                              {stat.isUnlimited ? (
+                                <div className="space-y-1">
+                                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">∞</div>
+                                  <div className="text-xs font-semibold text-green-700 dark:text-green-400">Unlimited</div>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <div className={`text-3xl font-bold ${
+                                    isExhausted 
+                                      ? 'text-red-600 dark:text-red-400' 
+                                      : isLow
+                                      ? 'text-orange-600 dark:text-orange-400'
+                                      : 'text-green-600 dark:text-green-400'
+                                  }`}>
+                                    {stat.remaining}
+                                  </div>
+                                  <div className={`text-xs font-semibold ${
+                                    isExhausted 
+                                      ? 'text-red-700 dark:text-red-400' 
+                                      : isLow
+                                      ? 'text-orange-700 dark:text-orange-400'
+                                      : 'text-gray-700 dark:text-gray-300'
+                                  }`}>
+                                    {stat.remaining === 1 ? 'remaining' : 'remaining'}
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            {!stat.isUnlimited && (
-                              <>
-                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-1">
+
+                            {/* Usage Details */}
+                            <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Used</span>
+                                <span className={`text-xs font-bold ${
+                                  isExhausted ? 'text-red-600 dark:text-red-400' :
+                                  isLow ? 'text-orange-600 dark:text-orange-400' :
+                                  'text-gray-700 dark:text-gray-300'
+                                }`}>
+                                  {stat.currentUsage} / {stat.limit}
+                                </span>
+                              </div>
+                              {!stat.isUnlimited && (
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                   <div 
                                     className={`h-2 rounded-full transition-all duration-300 ${
                                       isExhausted ? 'bg-red-500' :
@@ -380,18 +428,16 @@ const HomePage = () => {
                                     style={{ width: `${Math.min(stat.percentage, 100)}%` }}
                                   />
                                 </div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-gray-500 dark:text-gray-500">
-                                    {stat.remaining > 0 ? `${stat.remaining} remaining` : 'Limit reached'}
-                                  </span>
-                                  {isExhausted && (
-                                    <Link to="/pricing" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                                      Upgrade
-                                    </Link>
-                                  )}
-                                </div>
-                              </>
-                            )}
+                              )}
+                              {isExhausted && (
+                                <Link 
+                                  to="/pricing" 
+                                  className="block w-full text-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors pt-1"
+                                >
+                                  Upgrade Plan →
+                                </Link>
+                              )}
+                            </div>
                           </div>
                         );
                       })()}

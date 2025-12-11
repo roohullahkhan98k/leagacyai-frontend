@@ -692,7 +692,7 @@ const BillingDashboardPage = () => {
                 <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
                   <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                    Usage Overview - {usage.plan.toUpperCase()} Plan
+                    Feature Usage - {usage.plan.toUpperCase()} Plan
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -701,13 +701,13 @@ const BillingDashboardPage = () => {
                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {[
-                        { key: 'voice_clones', label: 'Voice Clones', icon: <Mic className="h-5 w-5" /> },
-                        { key: 'avatar_generations', label: 'Avatar Generations', icon: <User className="h-5 w-5" /> },
-                        { key: 'memory_graph_operations', label: 'Memory Nodes', icon: <Network className="h-5 w-5" /> },
-                        { key: 'interview_sessions', label: 'Interview Sessions', icon: <BrainCircuit className="h-5 w-5" /> },
-                        { key: 'multimedia_uploads', label: 'Multimedia Nodes', icon: <Image className="h-5 w-5" /> }
+                        { key: 'voice_clones', label: 'Voice Clones', icon: <Mic className="h-6 w-6" />, description: 'Voice cloning operations' },
+                        { key: 'avatar_generations', label: 'Avatar Generations', icon: <User className="h-6 w-6" />, description: '3D avatar creations' },
+                        { key: 'memory_graph_operations', label: 'Memory Nodes', icon: <Network className="h-6 w-6" />, description: 'Memory graph operations' },
+                        { key: 'interview_sessions', label: 'Interview Sessions', icon: <BrainCircuit className="h-6 w-6" />, description: 'AI interview sessions' },
+                        { key: 'multimedia_uploads', label: 'Multimedia Nodes', icon: <Image className="h-6 w-6" />, description: 'Multimedia node creations' }
                       ].map((feature) => {
                         const stat = usage.stats[feature.key as keyof typeof usage.stats];
                         const isLow = !stat.isUnlimited && stat.percentage >= 80;
@@ -716,59 +716,97 @@ const BillingDashboardPage = () => {
                         return (
                           <div
                             key={feature.key}
-                            className="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                            className={`p-5 rounded-xl border-2 ${
+                              isExhausted 
+                                ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700' 
+                                : isLow
+                                ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700'
+                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                            }`}
                           >
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                            {/* Feature Header */}
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className={`p-2.5 rounded-lg ${
+                                isExhausted 
+                                  ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' 
+                                  : isLow
+                                  ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                              }`}>
                                 {feature.icon}
                               </div>
-                              <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                                {feature.label}
-                              </h4>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-gray-900 dark:text-white text-base">
+                                  {feature.label}
+                                </h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-500">
+                                  {feature.description}
+                                </p>
+                              </div>
                             </div>
-                            <div className="space-y-2">
+
+                            {/* Remaining Count - Most Prominent */}
+                            <div className="text-center mb-4 py-3">
+                              {stat.isUnlimited ? (
+                                <div className="space-y-1">
+                                  <div className="text-4xl font-bold text-green-600 dark:text-green-400">∞</div>
+                                  <div className="text-sm font-semibold text-green-700 dark:text-green-400">Unlimited</div>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <div className={`text-4xl font-bold ${
+                                    isExhausted 
+                                      ? 'text-red-600 dark:text-red-400' 
+                                      : isLow
+                                      ? 'text-orange-600 dark:text-orange-400'
+                                      : 'text-green-600 dark:text-green-400'
+                                  }`}>
+                                    {stat.remaining}
+                                  </div>
+                                  <div className={`text-sm font-semibold ${
+                                    isExhausted 
+                                      ? 'text-red-700 dark:text-red-400' 
+                                      : isLow
+                                      ? 'text-orange-700 dark:text-orange-400'
+                                      : 'text-gray-700 dark:text-gray-300'
+                                  }`}>
+                                    {stat.remaining === 1 ? 'remaining' : 'remaining'}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Usage Details */}
+                            <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-gray-600 dark:text-gray-400">Usage</span>
-                                <span className={`text-sm font-semibold ${
+                                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Used</span>
+                                <span className={`text-xs font-bold ${
                                   isExhausted ? 'text-red-600 dark:text-red-400' :
                                   isLow ? 'text-orange-600 dark:text-orange-400' :
-                                  'text-gray-900 dark:text-white'
+                                  'text-gray-700 dark:text-gray-300'
                                 }`}>
-                                  {stat.isUnlimited ? '∞ Unlimited' : `${stat.currentUsage} / ${stat.limit}`}
+                                  {stat.currentUsage} / {stat.limit}
                                 </span>
                               </div>
                               {!stat.isUnlimited && (
-                                <>
-                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div
-                                      className={`h-2 rounded-full transition-all ${
-                                        isExhausted ? 'bg-red-500' :
-                                        isLow ? 'bg-orange-500' :
-                                        'bg-green-500'
-                                      }`}
-                                      style={{ width: `${Math.min(stat.percentage, 100)}%` }}
-                                    />
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-xs font-medium ${
-                                      isExhausted ? 'text-red-600 dark:text-red-400' :
-                                      isLow ? 'text-orange-600 dark:text-orange-400' :
-                                      'text-gray-600 dark:text-gray-400'
-                                    }`}>
-                                      {stat.remaining > 0 ? `${stat.remaining} remaining` : 'Limit reached'}
-                                    </span>
-                                    {isExhausted && (
-                                      <Link to="/pricing" className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
-                                        Upgrade
-                                      </Link>
-                                    )}
-                                  </div>
-                                </>
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                  <div
+                                    className={`h-2.5 rounded-full transition-all ${
+                                      isExhausted ? 'bg-red-500' :
+                                      isLow ? 'bg-orange-500' :
+                                      'bg-green-500'
+                                    }`}
+                                    style={{ width: `${Math.min(stat.percentage, 100)}%` }}
+                                  />
+                                </div>
                               )}
-                              {stat.isUnlimited && (
-                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                  Unlimited access
-                                </span>
+                              {isExhausted && (
+                                <Link 
+                                  to="/pricing" 
+                                  className="block w-full text-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors pt-1"
+                                >
+                                  Upgrade Plan →
+                                </Link>
                               )}
                             </div>
                           </div>
