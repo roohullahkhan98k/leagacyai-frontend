@@ -222,6 +222,12 @@ const Header = () => {
                     </p>
                   </div>
                 </div>
+                <Link to="/billing" onClick={() => setIsMobileMenuOpen(false)}>
+                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 rounded-lg transition-all duration-200">
+                    <CreditCard className="h-4 w-4" />
+                    <span>Billing</span>
+                  </button>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors"

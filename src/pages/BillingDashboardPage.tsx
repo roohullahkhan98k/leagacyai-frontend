@@ -444,12 +444,12 @@ const BillingDashboardPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {t('billing.title')}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400 text-base">
                 {t('billing.subtitle')}
               </p>
             </div>
@@ -485,9 +485,10 @@ const BillingDashboardPage = () => {
         ) : (
           <div className="space-y-6">
             {/* Current Subscription */}
-            <Card className="border border-gray-200 dark:border-gray-700">
-              <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+              <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                   Current Subscription
                 </CardTitle>
               </CardHeader>
@@ -495,30 +496,48 @@ const BillingDashboardPage = () => {
                 {billing.subscription && (
                   <div className="space-y-6">
                     {/* Plan Info */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                       <div>
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-3 mb-3">
                           <span className="text-2xl font-semibold text-gray-900 dark:text-white capitalize">
                             {billing.subscription.plan}
                           </span>
                           <span className={`px-2.5 py-1 rounded-md text-xs font-medium ${
-                            billing.subscription.status === 'active' 
+                            billing.subscription.cancelAtPeriodEnd
+                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
+                              : billing.subscription.status === 'active' 
                               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                              : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400'
                           }`}>
-                            {billing.subscription.status}
+                            {billing.subscription.cancelAtPeriodEnd ? 'Canceling' : billing.subscription.status}
                           </span>
                         </div>
-                        {billing.subscription.cancelAtPeriodEnd && (
-                          <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
-                            <div className="flex items-start gap-2">
-                              <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                        {billing.subscription.cancelAtPeriodEnd ? (
+                          <div className="mt-3 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                            <div className="flex items-start gap-3">
+                              <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                               <div className="text-sm text-orange-800 dark:text-orange-300">
-                                <p className="font-medium">Scheduled for cancellation</p>
+                                <p className="font-semibold mb-1">Scheduled for cancellation</p>
                                 <p className="mt-1">
                                   Your subscription will be automatically canceled at the end of your billing period.
                                   {billing.subscription.currentPeriodEnd && (
                                     <> You can resume it anytime before <span className="font-semibold">{formatDate(billing.subscription.currentPeriodEnd)}</span>.</>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <div className="flex items-start gap-3">
+                              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                              <div className="text-sm text-green-800 dark:text-green-300">
+                                <p className="font-semibold mb-1">Active subscription</p>
+                                <p className="mt-1">
+                                  {billing.subscription.currentPeriodEnd ? (
+                                    <>Your subscription will be automatically renewed on <span className="font-semibold">{formatDate(billing.subscription.currentPeriodEnd)}</span>.</>
+                                  ) : (
+                                    'Your subscription is active and will be automatically renewed.'
                                   )}
                                 </p>
                               </div>
@@ -538,7 +557,7 @@ const BillingDashboardPage = () => {
 
                     {/* Plan Actions */}
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
                         Change Plan
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -555,23 +574,23 @@ const BillingDashboardPage = () => {
                           return (
                             <div
                               key={planKey}
-                              className={`p-4 rounded-lg border transition-all ${
+                              className={`p-5 rounded-xl border-2 transition-all ${
                                 isCurrentPlan
-                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700'
-                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                  ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 dark:border-blue-700 shadow-sm'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm bg-white dark:bg-gray-800'
                               }`}
                             >
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-medium text-gray-900 dark:text-white capitalize">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="font-semibold text-gray-900 dark:text-white capitalize text-lg">
                                   {plan.name}
                                 </h4>
                                 {isCurrentPlan && (
                                   <CheckCircle2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                                 )}
                               </div>
-                              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-5">
                                 A${plan.price}
-                                <span className="text-sm font-normal text-gray-600 dark:text-gray-400">/mo</span>
+                                <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-1">/mo</span>
                               </p>
                               <Button
                                 size="sm"
@@ -634,7 +653,7 @@ const BillingDashboardPage = () => {
                             Cancel Subscription
                           </Button>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Your subscription will remain active until the end of your billing period. You can resume anytime before then.
+                            Canceling will schedule your subscription to end at the end of your current billing period. You can resume anytime before then.
                           </p>
                         </div>
                       )}
@@ -646,10 +665,10 @@ const BillingDashboardPage = () => {
 
             {/* Payment Method */}
             {billing.paymentMethod && (
-              <Card className="border border-gray-200 dark:border-gray-700">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                     Payment Method
                   </CardTitle>
                 </CardHeader>
@@ -657,14 +676,14 @@ const BillingDashboardPage = () => {
                   {billing.paymentMethod.card && (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
-                          <CreditCard className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                        <div className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                          <CreditCard className="h-6 w-6 text-gray-700 dark:text-gray-300" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="font-semibold text-gray-900 dark:text-white text-base">
                             {billing.paymentMethod.card.brand.toUpperCase()} ****{billing.paymentMethod.card.last4}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             Expires {billing.paymentMethod.card.expMonth}/{billing.paymentMethod.card.expYear}
                           </p>
                         </div>
@@ -677,30 +696,30 @@ const BillingDashboardPage = () => {
 
             {/* Upcoming Invoice */}
             {billing.upcomingInvoice && (
-              <Card className="border border-gray-200 dark:border-gray-700">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                     Upcoming Invoice
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Amount</span>
-                      <span className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Amount</span>
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
                         {formatCurrency(billing.upcomingInvoice.amount, billing.upcomingInvoice.currency)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Next Payment</span>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="flex items-center justify-between py-2 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Next Payment</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
                         {formatDate(billing.upcomingInvoice.nextPaymentAttempt)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Period</span>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="flex items-center justify-between py-2 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Period</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
                         {formatDate(billing.upcomingInvoice.periodStart)} - {formatDate(billing.upcomingInvoice.periodEnd)}
                       </span>
                     </div>
@@ -711,10 +730,10 @@ const BillingDashboardPage = () => {
 
             {/* Invoice History */}
             {billing.invoices && billing.invoices.length > 0 && (
-              <Card className="border border-gray-200 dark:border-gray-700">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                     Invoice History
                   </CardTitle>
                 </CardHeader>
@@ -723,14 +742,14 @@ const BillingDashboardPage = () => {
                     {billing.invoices.map((invoice) => (
                       <div
                         key={invoice.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                        className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className="font-semibold text-gray-900 dark:text-white text-base">
                               {invoice.number}
                             </p>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
                               invoice.status === 'paid'
                                 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                                 : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
