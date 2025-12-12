@@ -72,6 +72,12 @@ export interface ResetLimitsResponse {
 }
 
 // User Management Interfaces
+export interface UserSubscription {
+  hasSubscription: boolean;
+  plan?: string;
+  status?: string;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -81,8 +87,12 @@ export interface AdminUser {
   role: string;
   isActive: boolean;
   isVerified: boolean;
-  created_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lastLogin?: string;
   avatar?: string;
+  stripe_customer_id?: string;
+  subscription?: UserSubscription;
 }
 
 export interface UserStatistics {

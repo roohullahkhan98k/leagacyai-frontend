@@ -106,10 +106,33 @@ const UserDetailModal = ({ isOpen, onClose, user, userDetail, loading, onEdit, o
                       <div className="flex items-center gap-2 mt-1">
                         <Calendar className="h-4 w-4 text-gray-400" />
                         <span className="text-gray-900 dark:text-white">
-                          {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
+                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }) : '-'}
                         </span>
                       </div>
                     </div>
+                    {user.lastLogin && (
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Login</label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Calendar className="h-4 w-4 text-gray-400" />
+                          <span className="text-gray-900 dark:text-white">
+                            {new Date(user.lastLogin).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

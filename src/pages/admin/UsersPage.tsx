@@ -188,6 +188,34 @@ const UsersPage = () => {
       )
     },
     {
+      key: 'subscription',
+      header: 'Subscription',
+      render: (user: AdminUser) => {
+        if (!user.subscription || !user.subscription.hasSubscription || user.subscription.status !== 'active') {
+          return (
+            <span className="text-xs text-gray-500 dark:text-gray-400 italic">No active plan</span>
+          );
+        }
+        
+        const planColors: Record<string, string> = {
+          'personal': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800',
+          'premium': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
+          'ultimate': 'bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 text-yellow-800 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700'
+        };
+        
+        const planName = user.subscription.plan || 'Unknown';
+        const displayName = planName.charAt(0).toUpperCase() + planName.slice(1);
+        
+        return (
+          <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold capitalize ${
+            planColors[planName] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+          }`}>
+            {displayName}
+          </span>
+        );
+      }
+    },
+    {
       key: 'status',
       header: 'Status',
       render: (user: AdminUser) => (
