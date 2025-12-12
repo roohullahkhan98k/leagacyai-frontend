@@ -1042,7 +1042,7 @@ const MemoryGraphPage = () => {
                               <ChevronDown className={cn("h-2 w-2 transition-transform", languageDropdownOpen[node.id] && "rotate-180")} />
                             </button>
                             {languageDropdownOpen[node.id] && (
-                              <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 min-w-[120px]">
+                              <div className="absolute bottom-full right-0 mb-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-[60] min-w-[120px] max-h-[250px] overflow-y-auto overscroll-contain">
                                 {availableLanguages.map((lang: string) => (
                                   <button
                                     key={lang}
@@ -1058,12 +1058,12 @@ const MemoryGraphPage = () => {
                                         });
                                       }
                                     }}
-                                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 whitespace-nowrap"
                                   >
-                                    <Globe className="h-3 w-3" />
+                                    <Globe className="h-3 w-3 flex-shrink-0" />
                                     {lang.toUpperCase()}
                                     {lang === displayLanguage && (
-                                      <span className="ml-auto text-xs text-primary-600">✓</span>
+                                      <span className="ml-auto text-xs text-primary-600 flex-shrink-0">✓</span>
                                     )}
                                   </button>
                                 ))}

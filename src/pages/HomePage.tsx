@@ -430,7 +430,11 @@ const HomePage = () => {
                                   isLow ? 'text-orange-600 dark:text-orange-400' :
                                   'text-gray-700 dark:text-gray-300'
                                 }`}>
-                                  {stat.currentUsage} / {stat.limit}
+                                  {stat.isUnlimited ? (
+                                    <span className="text-green-600 dark:text-green-400">{stat.currentUsage} used</span>
+                                  ) : (
+                                    <span>{stat.currentUsage} / {stat.limit}</span>
+                                  )}
                                 </span>
                               </div>
                               {!stat.isUnlimited && (
