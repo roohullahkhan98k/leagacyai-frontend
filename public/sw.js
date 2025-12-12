@@ -1,7 +1,7 @@
-const CACHE_NAME = 'legacy-ai-v4';
+const CACHE_NAME = 'legacy-ai-v5';
 
-const STATIC_CACHE = 'legacy-ai-static-v4';
-const API_CACHE = 'legacy-ai-api-v4';
+const STATIC_CACHE = 'legacy-ai-static-v5';
+const API_CACHE = 'legacy-ai-api-v5';
 
 const staticUrlsToCache = [
   '/',

@@ -20,8 +20,8 @@ const AdminPage = () => {
       return;
     }
 
-    // Redirect to packages page by default
-    navigate('/admin/packages', { replace: true });
+    // Redirect to analytics page by default
+    navigate('/admin/analytics', { replace: true });
   }, [isAuthenticated, user, navigate]);
 
   return null; // This page just redirects

@@ -1,6 +1,8 @@
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
+  BarChart3,
+  CreditCard,
   Package, 
   Users, 
   LogOut
@@ -14,11 +16,32 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Load sidebar state from localStorage on mount
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem('adminSidebarOpen');
+    return saved !== null ? saved === 'true' : true;
+  });
   const location = useLocation();
   const { user, logout } = useAuth();
 
+  // Save sidebar state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('adminSidebarOpen', String(sidebarOpen));
+  }, [sidebarOpen]);
+
   const menuItems = [
+    {
+      icon: BarChart3,
+      label: 'Analytics',
+      path: '/admin/analytics',
+      key: 'analytics'
+    },
+    {
+      icon: CreditCard,
+      label: 'Subscriptions',
+      path: '/admin/subscriptions',
+      key: 'subscriptions'
+    },
     {
       icon: Package,
       label: 'Packages',

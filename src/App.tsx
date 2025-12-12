@@ -12,6 +12,8 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
 import BillingDashboardPage from './pages/BillingDashboardPage';
 import AdminPage from './pages/AdminPage';
+import AnalyticsPage from './pages/admin/AnalyticsPage';
+import SubscriptionsPage from './pages/admin/SubscriptionsPage';
 import PackagesPage from './pages/admin/PackagesPage';
 import UsersPage from './pages/admin/UsersPage';
 import InterviewPage from './features/ai-interview';
@@ -98,6 +100,22 @@ function AppContent() {
               element={
                 <AdminRoute>
                   <AdminPage />
+                </AdminRoute>
+              }
+            />
+            <Route 
+              path="/admin/analytics" 
+              element={
+                <AdminRoute>
+                  <AnalyticsPage />
+                </AdminRoute>
+              }
+            />
+            <Route 
+              path="/admin/subscriptions" 
+              element={
+                <AdminRoute>
+                  <SubscriptionsPage />
                 </AdminRoute>
               }
             />
