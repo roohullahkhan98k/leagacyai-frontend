@@ -71,6 +71,94 @@ export interface ResetLimitsResponse {
   limits: any[];
 }
 
+// User Management Interfaces
+export interface AdminUser {
+  id: string;
+  email: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  role: string;
+  isActive: boolean;
+  isVerified: boolean;
+  created_at?: string;
+  avatar?: string;
+}
+
+export interface UserStatistics {
+  interviews: number;
+  memories: number;
+  voices: number;
+  avatars: number;
+  hasSubscription: boolean;
+  subscription?: {
+    plan: string;
+    status: string;
+    current_period_start: string;
+    current_period_end: string;
+    cancel_at_period_end: boolean;
+    stripe_subscription_id?: string;
+  };
+}
+
+export interface GetUsersResponse {
+  success: boolean;
+  users: AdminUser[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface GetUserResponse {
+  success: boolean;
+  user: AdminUser;
+  statistics: UserStatistics;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  username: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  isActive?: boolean;
+  isVerified?: boolean;
+}
+
+export interface UpdateUserRequest {
+  email?: string;
+  username?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  isActive?: boolean;
+  isVerified?: boolean;
+  avatar?: string;
+}
+
+export interface DeleteUserResponse {
+  success: boolean;
+  message: string;
+  deleted: {
+    user: boolean;
+    interviews: number;
+    memories: number;
+    voices: number;
+    generatedAudio: number;
+    avatars: number;
+    multimedia: number;
+    multimediaNodes: number;
+    multimediaLinks: number;
+    subscriptions: number;
+    usage: number;
+  };
+}
+
 /**
  * Get all feature limits for all plans
  */
@@ -194,3 +282,169 @@ export async function resetLimitsToDefaults(): Promise<ResetLimitsResponse> {
   }
 }
 
+// User Management Functions
+
+/**
+ * Get all users with pagination and filters
+ */
+export async function getUsers(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  isActive?: boolean;
+}): Promise<GetUsersResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.role) queryParams.append('role', params.role);
+    if (params?.isActive !== undefined) queryParams.append('isActive', params.isActive.toString());
+
+    const response = await fetch(`${API_URL}/api/admin/users?${queryParams.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to fetch users' }));
+      throw new Error(errorData.error || 'Failed to fetch users');
+    }
+
+    const data: GetUsersResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get single user with statistics
+ */
+export async function getUser(id: string): Promise<GetUserResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/admin/users/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to fetch user' }));
+      throw new Error(errorData.error || 'Failed to fetch user');
+    }
+
+    const data: GetUserResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new user
+ */
+export async function createUser(userData: CreateUserRequest): Promise<{ success: boolean; user: AdminUser }> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/admin/users`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to create user' }));
+      throw new Error(errorData.error || 'Failed to create user');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update a user
+ */
+export async function updateUser(id: string, userData: UpdateUserRequest): Promise<{ success: boolean; user: AdminUser }> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/admin/users/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to update user' }));
+      throw new Error(errorData.error || 'Failed to update user');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a user
+ */
+export async function deleteUser(id: string): Promise<DeleteUserResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('User must be logged in');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/admin/users/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to delete user' }));
+      throw new Error(errorData.error || 'Failed to delete user');
+    }
+
+    const data: DeleteUserResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+}

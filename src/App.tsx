@@ -12,6 +12,8 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
 import BillingDashboardPage from './pages/BillingDashboardPage';
 import AdminPage from './pages/AdminPage';
+import PackagesPage from './pages/admin/PackagesPage';
+import UsersPage from './pages/admin/UsersPage';
 import InterviewPage from './features/ai-interview';
 import MemoryGraphPage from './features/memory-graph';
 import VoiceCloningPage from './features/voice-cloning';
@@ -55,12 +57,13 @@ function AppContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Hide header on login, register, and payment pages
+  // Hide header on login, register, payment pages, and admin pages (admin has its own header)
   const shouldShowHeader = !isInterviewActive && 
     location.pathname !== '/login' && 
     location.pathname !== '/register' &&
     location.pathname !== '/subscription/success' &&
-    location.pathname !== '/subscription/cancel';
+    location.pathname !== '/subscription/cancel' &&
+    !location.pathname.startsWith('/admin');
 
   // Scroll to top on route change
   useEffect(() => {
@@ -95,6 +98,22 @@ function AppContent() {
               element={
                 <AdminRoute>
                   <AdminPage />
+                </AdminRoute>
+              }
+            />
+            <Route 
+              path="/admin/packages" 
+              element={
+                <AdminRoute>
+                  <PackagesPage />
+                </AdminRoute>
+              }
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <AdminRoute>
+                  <UsersPage />
                 </AdminRoute>
               }
             />
